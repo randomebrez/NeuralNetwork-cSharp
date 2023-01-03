@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>NeuralNetwork.Tests.cs</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\NeuralNetwork.Interfaces\NeuralNetwork.Interfaces.csproj" />
+      <ProjectReference Include="..\NeuralNetwork\NeuralNetwork.csproj" />
+    </ItemGroup>
+
+</Project>
