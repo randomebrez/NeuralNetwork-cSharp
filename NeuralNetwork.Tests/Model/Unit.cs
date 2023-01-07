@@ -115,6 +115,8 @@ public class Unit
                 Move(0, jumpSize/2);
                 Move(1, -jumpSize/2);
                 break;
+            case 8:
+                break;//Don't move
         }
         
     }

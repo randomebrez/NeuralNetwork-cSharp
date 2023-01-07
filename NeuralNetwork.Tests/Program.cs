@@ -8,9 +8,9 @@ if (File.Exists(logfilepath))
 
 var networkCaracteristics = new NetworkCaracteristics
 {
-    GeneNumber = 10,
+    GeneNumber = 32,
     InputNumber = 4,
-    OutputNumber = 4,
+    OutputNumber = 8,
     NeutralNumber = 2,
     WeighBytesNumber = 4
 };
@@ -20,15 +20,15 @@ var totalNumberOfGenes = (networkCaracteristics.InputNumber + networkCaracterist
 
 var spaceDimensions = new int[] { 50, 50 };
 var maxPopulationNumber = 100;
-var numberOfGenerations = 200;
-var unitLifeTime = 200;
-var selectionRadius = 0.2f;
+var numberOfGenerations = 150;
+var unitLifeTime = 150;
+var selectionRadius = 0.1f;
 int? numberOfBestToSave = null;
 
 var environmentManager = new EnvironmentManager(networkCaracteristics, maxPopulationNumber);
 
 var fileText = environmentManager.ExecuteLife(spaceDimensions, numberOfGenerations, unitLifeTime, selectionRadius, numberOfBestToSave);
-
+fileText = $"{maxPopulationNumber * unitLifeTime}\n{fileText}";
 using (var fileStream = File.OpenWrite(logfilepath))
 {
     var bytes = new UTF8Encoding().GetBytes(fileText.Replace(',', '.'), 0, fileText.Length);

@@ -42,7 +42,7 @@ namespace NeuralNetwork.Managers
                 var computedValue = 0f;
                 foreach (var vertex in vertexBatch)
                     computedValue += vertex.Origin.Value * vertex.Weight;
-                targetNeuron.Value = computedValue / vertexBatch.Count();
+                targetNeuron.Value = computedValue;
                 targetNeuron.ActivationFunction();
             }
         }

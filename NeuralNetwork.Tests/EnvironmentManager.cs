@@ -52,7 +52,7 @@ public class EnvironmentManager
             
             //Select The Best
             var numberOfSurvivors = SelectBestUnits(selectionRadius * StaticSpaceDimension.SpaceDimensions[0].max, nubmberOfBestToSave);
-            //var numberOfSurvivors = SelectBestUnitsLateral(0.8f);
+            //var numberOfSurvivors = SelectBestUnitsLateral(0.9f);
             //Console.WriteLine($"{i};{numberOfSurvivors};{_generationsOutputs[i]}");
             
             //Save logs
