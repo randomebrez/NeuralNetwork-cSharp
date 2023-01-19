@@ -77,8 +77,8 @@ public class EnvironmentManager
             var newUnit = new UnitManager(t, GetRandomPosition(), unitLifeTime, generationId);
             _units.Add(newUnit.GetUnit.Identifier, newUnit);
         }
-        _sqlGateway.StoreUnitsAsync(_units.Values.Select(t => t.GetUnit).ToList()).GetAwaiter().GetResult();
-        _sqlGateway.StoreUnitBrainsAsync(_units.Values.Select(t => t.GetUnit).ToList()).GetAwaiter().GetResult();
+        //_sqlGateway.StoreUnitsAsync(_units.Values.Select(t => t.GetUnit).ToList()).GetAwaiter().GetResult();
+        //_sqlGateway.StoreUnitBrainsAsync(_units.Values.Select(t => t.GetUnit).ToList()).GetAwaiter().GetResult();
     }
 
     private void ExecuteGenerationLife()
@@ -89,7 +89,7 @@ public class EnvironmentManager
             foreach (var unit in _units.Values)
                 unit.ExecuteAction(i + 1);
         }
-        _sqlGateway.StoreLifeStepAsync(_units.Values.Select(t => t.GetUnitWithPositions).ToList()).GetAwaiter().GetResult();
+        //_sqlGateway.StoreLifeStepAsync(_units.Values.Select(t => t.GetUnitWithPositions).ToList()).GetAwaiter().GetResult();
     }
     
     private int SelectBestUnits(float radius, int? maxNumberToTake)

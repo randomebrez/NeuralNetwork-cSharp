@@ -16,9 +16,9 @@ if (File.Exists(logfilepath))
 
 var networkCaracteristics = new NetworkCaracteristics
 {
-    GeneNumber = 10,
+    GeneNumber = 16,
     InputNumber = 4,
-    OutputNumber = 4,
+    OutputNumber = 8,
     NeutralNumber = 2,
     WeighBytesNumber = 4
 };
@@ -28,8 +28,8 @@ var totalNumberOfGenes = (networkCaracteristics.InputNumber + networkCaracterist
 
 var spaceDimensions = new int[] { 50, 50 };
 var maxPopulationNumber = 100;
-var numberOfGenerations = 10;
-var unitLifeTime = 200;
+var numberOfGenerations = 100;
+var unitLifeTime = 150;
 var selectionRadius = 0.2f;
 int? numberOfBestToSave = null;
 

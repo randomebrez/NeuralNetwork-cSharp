@@ -90,10 +90,10 @@ public class PopulationManager : IPopulation
             {
                 geneCodes.Add($"I:{i}-N:{j}");
             }
-            for (int k = 0; k < _dimension.OutputNumber; k++)
-            {
-                geneCodes.Add($"I:{i}-O:{k}");
-            }
+            //for (int k = 0; k < _dimension.OutputNumber; k++)
+            //{
+            //    geneCodes.Add($"I:{i}-O:{k}");
+            //}
         }
         for (int i = 0; i < _dimension.NeutralNumber; i++)
         {
