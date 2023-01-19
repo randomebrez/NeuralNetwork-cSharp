@@ -1,24 +1,26 @@
 ﻿using System.Text;
 using NeuralNetwork.Helpers;
+using NeuralNetwork.Implementations;
 using NeuralNetwork.Interfaces.Model;
 using NeuralNetwork.Managers;
-using NeuralNetwork.Tests.Model;
 
 namespace NeuralNetwork.Tests;
 
 public class EnvironmentManager
 {
+    private readonly DatabaseGateway _sqlGateway;
     private readonly PopulationManager _populationManager;
 
     private int _maxPopulationNumber;
-    private Dictionary<Guid, Unit> _units = new Dictionary<Guid, Unit>();
+    private Dictionary<Guid, UnitManager> _units = new Dictionary<Guid, UnitManager>();
     private List<Brain> _selectedBrains = new List<Brain>();
     private readonly Dictionary<int, string> _generationsOutputs = new Dictionary<int, string>();
     private readonly NetworkCaracteristics _networkCaracteristics;
     
-    public EnvironmentManager(NetworkCaracteristics networkCaracteristics, int maxPopulationNumber)
+    public EnvironmentManager(DatabaseGateway sqlGateway, NetworkCaracteristics networkCaracteristics, int maxPopulationNumber)
     {
-        _populationManager = new PopulationManager(networkCaracteristics);
+        _sqlGateway = sqlGateway;
+        _populationManager = new PopulationManager(sqlGateway, networkCaracteristics);
         _maxPopulationNumber = maxPopulationNumber;
         _networkCaracteristics = networkCaracteristics;
     }
@@ -37,7 +39,7 @@ public class EnvironmentManager
         {
             Console.WriteLine($"Starting Generation {i}");
             // Get the population
-            GetNextGeneration(unitLifeTime);
+            GetNextGeneration(unitLifeTime, i + 1);
             
             //save initial position
             //logs.Append(SavePosition());
@@ -61,7 +63,7 @@ public class EnvironmentManager
         return logs.ToString();
     }
 
-    private void GetNextGeneration(int unitLifeTime)
+    private void GetNextGeneration(int unitLifeTime, int generationId)
     {
         _units.Clear();
         Brain[] brains;
@@ -72,19 +74,22 @@ public class EnvironmentManager
         for (var index = 0; index < brains.Length; index++)
         {
             var t = brains[index];
-            var newUnit = new Unit(t, GetRandomPosition(), unitLifeTime);
-            _units.Add(newUnit.Identifier, newUnit);
+            var newUnit = new UnitManager(t, GetRandomPosition(), unitLifeTime, generationId);
+            _units.Add(newUnit.GetUnit.Identifier, newUnit);
         }
+        _sqlGateway.StoreUnitsAsync(_units.Values.Select(t => t.GetUnit).ToList()).GetAwaiter().GetResult();
+        _sqlGateway.StoreUnitBrainsAsync(_units.Values.Select(t => t.GetUnit).ToList()).GetAwaiter().GetResult();
     }
 
     private void ExecuteGenerationLife()
     {
-        var loopCounter = _units.First().Value.LifeTime;
+        var loopCounter = _units.First().Value.GetUnit.LifeTime;
         for (int i = 0; i < loopCounter; i++)
         {
             foreach (var unit in _units.Values)
-                unit.ExecuteAction();
+                unit.ExecuteAction(i + 1);
         }
+        _sqlGateway.StoreLifeStepAsync(_units.Values.Select(t => t.GetUnitWithPositions).ToList()).GetAwaiter().GetResult();
     }
     
     private int SelectBestUnits(float radius, int? maxNumberToTake)
@@ -96,13 +101,13 @@ public class EnvironmentManager
         {
             var squareSum = 0f;
             for (int j = 0; j < StaticSpaceDimension.DimensionNumber; j++)
-                squareSum += (float)Math.Pow(unit.Position.GetCoordinate(j), 2);
-            unitCenterDistances.Add(unit.Identifier, squareSum);
+                squareSum += (float)Math.Pow(unit.GetUnit.Position.GetCoordinate(j), 2);
+            unitCenterDistances.Add(unit.GetUnit.Identifier, squareSum);
         }
         var selectedUnits = unitCenterDistances.OrderBy(t => t.Value).Where(t => t.Value < radiusToReach);
         var survivorNumber = selectedUnits.Count();
         foreach (var unitPair in selectedUnits.Take(maxNumberToTake??survivorNumber))
-            _selectedBrains.Add(_units[unitPair.Key].Brain);
+            _selectedBrains.Add(_units[unitPair.Key].GetUnit.Brain);
 
         return survivorNumber;
     }
@@ -143,7 +148,7 @@ public class EnvironmentManager
         var logs = new StringBuilder();
         foreach (var unit in _units.Values)
         {
-            logs.AppendLine($"{unit.Position.GetCoordinate(0)};{unit.Position.GetCoordinate(1)}");
+            logs.AppendLine($"{unit.GetUnit.Position.GetCoordinate(0)};{unit.GetUnit.Position.GetCoordinate(1)}");
         }
 
         return logs.ToString();
@@ -156,9 +161,9 @@ public class EnvironmentManager
         var survivorNumber = 0;
         foreach (var unit in _units.Values)
         {
-            if (unit.Position.GetCoordinate(0) >= minCoordinateToReach)
+            if (unit.GetUnit.Position.GetCoordinate(0) >= minCoordinateToReach)
             {
-                _selectedBrains.Add(unit.Brain);
+                _selectedBrains.Add(unit.GetUnit.Brain);
                 survivorNumber++;
             }
         }

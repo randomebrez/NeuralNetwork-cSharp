@@ -110,6 +110,7 @@ namespace NeuralNetwork.Helpers
 
             return new Vertex
             {
+                Identifier = gene.VertexIdentifier,
                 Origin = availableNeurons[NeuronIdentifiers[0]],
                 Target = availableNeurons[NeuronIdentifiers[1]],
                 Weight = ComputeVertexWeigh(gene)
