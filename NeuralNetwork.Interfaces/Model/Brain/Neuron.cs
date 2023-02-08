@@ -20,7 +20,7 @@
 
         public int Layer { get; set; }
 
-        public virtual float ActivationFunction(float threshold = 0f)
+        public virtual float ActivationFunction(float threshold = 0.1f)
         {
             if (Value < threshold)
                 Value = 0;

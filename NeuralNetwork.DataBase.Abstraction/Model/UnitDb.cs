@@ -17,5 +17,11 @@ namespace NeuralNetwork.DataBase.Abstraction.Model
 
         [Column("selection_score")]
         public float? SelectionScore { get; set; }
+
+        [Column("simulation_id"), Required]
+        public int SimulationId { get; set; }
+
+        [ForeignKey(nameof(SimulationId))]
+        public Simulation Simulation { get; set; }
     }
 }

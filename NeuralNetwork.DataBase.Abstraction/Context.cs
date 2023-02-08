@@ -9,6 +9,8 @@ namespace NeuralNetwork.DataBase.Abstraction
         public Context(string connectionString)
         {
             _connectionString = connectionString;
+            //ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+            this.ChangeTracker.LazyLoadingEnabled = false;
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -29,5 +31,7 @@ namespace NeuralNetwork.DataBase.Abstraction
         public DbSet<OutputDb> Outputs { get; set; }
 
         public DbSet<UnitStepDb> UnitSteps { get; set; }
+
+        public DbSet<Simulation> Simulations { get; set; }
     }
 }

@@ -37,7 +37,9 @@ public class PopulationManager : IPopulation
     {
         var newBrains = new Brain[childNumber];
         var maximumTry = 10;
-        for (int i = 0; i < childNumber; i++)
+        var childrenNumberByBrain = 3;
+        var childrenFromParentNumber = childrenNumberByBrain * selectedBrains.Count() < childNumber ? childrenNumberByBrain * selectedBrains.Count() : childNumber;
+        for (int i = 0; i < childrenFromParentNumber; i++)
         {
             var validBrain = false;
             var currentTry = 0;
@@ -50,6 +52,23 @@ public class PopulationManager : IPopulation
             }
             if (validBrain)
                 newBrains[i] = brain;
+        }
+        if (childrenFromParentNumber < childNumber)
+        {
+            for (int i = childrenFromParentNumber; i < childNumber; i++)
+            {
+                var validBrain = false;
+                var currentTry = 0;
+                var brain = new Brain();
+                while (validBrain == false && currentTry < maximumTry)
+                {
+                    currentTry++;
+                    brain = BrainHelper.GenerateRandomBrain(_dimension, _baseNeurons, _geneCodes.ToList(), _neuronsDict);
+                    validBrain = brain != null;
+                }
+                if (validBrain)
+                    newBrains[i] = brain;
+            }
         }
 
         return newBrains;
@@ -90,10 +109,10 @@ public class PopulationManager : IPopulation
             {
                 geneCodes.Add($"I:{i}-N:{j}");
             }
-            //for (int k = 0; k < _dimension.OutputNumber; k++)
-            //{
-            //    geneCodes.Add($"I:{i}-O:{k}");
-            //}
+            for (int k = 0; k < _dimension.OutputNumber; k++)
+            {
+                geneCodes.Add($"I:{i}-O:{k}");
+            }
         }
         for (int i = 0; i < _dimension.NeutralNumber; i++)
         {

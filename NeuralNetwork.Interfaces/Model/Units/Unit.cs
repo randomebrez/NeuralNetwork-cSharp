@@ -21,5 +21,7 @@
         public int LifeTime { get; set; }
 
         public float? SelectionScore { get; set; }
+
+        public int SimulationId { get; set; }
     }
 }

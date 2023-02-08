@@ -12,7 +12,7 @@ namespace NeuralNetwork.Implementations
         private readonly Unit _unit;
         private string[] _positions;
 
-        public UnitManager(Brain brain, float[] startingPosition, int lifeTime, int generationId)
+        public UnitManager(Brain brain, float[] startingPosition, int lifeTime, int generationId, int simulationId)
         {
             _unit = new Unit
             {
@@ -22,7 +22,8 @@ namespace NeuralNetwork.Implementations
                 Fertile = true,
                 Brain = brain,
                 Age = 1,
-                GenerationId = generationId
+                GenerationId = generationId,
+                SimulationId = simulationId
             };
             _positions = new string[lifeTime + 1];
             _positions[0] = _unit.Position.ToString();

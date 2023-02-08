@@ -5,8 +5,10 @@ using NeuralNetwork.Implementations;
 using NeuralNetwork.Interfaces.Model;
 using NeuralNetwork.Tests;
 
-var logfilepath = @"C:\Users\Salocin\Desktop\Test\neuralTework.txt";
-var sqliteConnectionString = @"C:\Users\Salocin\Desktop\Test\NeuralNetworkDatabase.txt";
+var start = DateTime.UtcNow;
+
+var logfilepath = @"D:\Codes\Test\neuralTework.txt";
+var sqliteConnectionString = @"D:\Codes\Test\NeuralNetworkDatabase.txt";
 //if (File.Exists(sqliteConnectionString))
 //    File.Delete(sqliteConnectionString);
 //File.Create(sqliteConnectionString);
@@ -16,7 +18,7 @@ if (File.Exists(logfilepath))
 
 var networkCaracteristics = new NetworkCaracteristics
 {
-    GeneNumber = 16,
+    GeneNumber = 24,
     InputNumber = 4,
     OutputNumber = 8,
     NeutralNumber = 2,
@@ -28,7 +30,7 @@ var totalNumberOfGenes = (networkCaracteristics.InputNumber + networkCaracterist
 
 var spaceDimensions = new int[] { 50, 50 };
 var maxPopulationNumber = 100;
-var numberOfGenerations = 100;
+var maxNumberOfGeneration = 500;
 var unitLifeTime = 150;
 var selectionRadius = 0.2f;
 int? numberOfBestToSave = null;
@@ -36,7 +38,10 @@ int? numberOfBestToSave = null;
 var sqlGateway = new DatabaseGateway(new Context(sqliteConnectionString));
 var environmentManager = new EnvironmentManager(sqlGateway, networkCaracteristics, maxPopulationNumber);
 
-var fileText = environmentManager.ExecuteLife(spaceDimensions, numberOfGenerations, unitLifeTime, selectionRadius, numberOfBestToSave);
+var fileText = environmentManager.ExecuteLifeAsync(spaceDimensions, maxNumberOfGeneration, unitLifeTime, selectionRadius, numberOfBestToSave).GetAwaiter().GetResult();
+
+var delta = DateTime.UtcNow - start;
+Console.WriteLine($"\nSimulation ended in : {delta.Minutes}:{delta.Seconds}:{delta.Milliseconds}");
 
 using (var fileStream = File.OpenWrite(logfilepath))
 {
