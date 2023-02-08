@@ -1,67 +1,72 @@
 ﻿using System.Text;
 using NeuralNetwork.Helpers;
+using NeuralNetwork.Implementations;
 using NeuralNetwork.Interfaces.Model;
 using NeuralNetwork.Managers;
-using NeuralNetwork.Tests.Model;
 
 namespace NeuralNetwork.Tests;
 
 public class EnvironmentManager
 {
+    private readonly DatabaseGateway _sqlGateway;
     private readonly PopulationManager _populationManager;
 
     private int _maxPopulationNumber;
-    private Dictionary<Guid, Unit> _units = new Dictionary<Guid, Unit>();
+    private Dictionary<Guid, UnitManager> _units = new Dictionary<Guid, UnitManager>();
     private List<Brain> _selectedBrains = new List<Brain>();
-    private readonly Dictionary<int, string> _generationsOutputs = new Dictionary<int, string>();
     private readonly NetworkCaracteristics _networkCaracteristics;
     
-    public EnvironmentManager(NetworkCaracteristics networkCaracteristics, int maxPopulationNumber)
+    public EnvironmentManager(DatabaseGateway sqlGateway, NetworkCaracteristics networkCaracteristics, int maxPopulationNumber)
     {
-        _populationManager = new PopulationManager(networkCaracteristics);
+        _sqlGateway = sqlGateway;
+        _populationManager = new PopulationManager(sqlGateway, networkCaracteristics);
         _maxPopulationNumber = maxPopulationNumber;
         _networkCaracteristics = networkCaracteristics;
     }
 
-    public string ExecuteLife(int[] spaceDimensions, int numberOfGenerations, int unitLifeTime, float selectionRadius, int? nubmberOfBestToSave)
+    public async Task<string> ExecuteLifeAsync(int[] spaceDimensions, int maxNumberOfGeneration, int unitLifeTime, float selectionRadius, int? nubmberOfBestToSave)
     {
         var logs = new StringBuilder();
-        
+        var simulationId = await _sqlGateway.AddNewSimulationAsync();
+
         // Initialyze the life space
         StaticSpaceDimension.SpaceDimensions = new Dictionary<int, (int min, int max)>();
         for(int i = 0; i < spaceDimensions.Length; i ++)
             StaticSpaceDimension.SpaceDimensions.Add(i, (-spaceDimensions[i], spaceDimensions[i]));
+        var survivorNumber = 0;
+        var generationNumber = 0;
+        var successCount = 0;
 
         //Loop on generations
-        for (int i = 0; i < numberOfGenerations; i++)
+        while (successCount < 10 && generationNumber < maxNumberOfGeneration)
         {
-            Console.WriteLine($"Starting Generation {i}");
+            var start = DateTime.UtcNow;
+            Console.WriteLine($"Starting Generation {generationNumber}");
             // Get the population
-            GetNextGeneration(unitLifeTime);
-            
-            //save initial position
-            //logs.Append(SavePosition());
-            
-            //Make them live
-            ExecuteGenerationLife();
+            await GetNextGenerationAsync(unitLifeTime, generationNumber + 1, simulationId);
 
-            // Store information to log concerning current generation
-            StoreGenerationInformation(i);
-            
-            //logs.Append(SavePosition());
-            
+            //Make them live
+            await ExecuteGenerationLifeAsync().ConfigureAwait(false);
+
             //Select The Best
-            var numberOfSurvivors = SelectBestUnits(selectionRadius * StaticSpaceDimension.SpaceDimensions[0].max, nubmberOfBestToSave);
-            //var numberOfSurvivors = SelectBestUnitsLateral(0.8f);
-            //Console.WriteLine($"{i};{numberOfSurvivors};{_generationsOutputs[i]}");
-            
-            //Save logs
-            logs.AppendLine($"{i};{numberOfSurvivors};{_generationsOutputs[i]}");
+            survivorNumber = SelectBestUnitsCircular(selectionRadius * StaticSpaceDimension.SpaceDimensions[0].max, nubmberOfBestToSave);
+            //survivorNumber = SelectBestUnitsLateral(0.1f);
+
+            generationNumber++;
+            var survivorPercent = 100 * ((float)survivorNumber / (float)_maxPopulationNumber);
+            if (survivorPercent > 80)
+                successCount++;
+            else
+                successCount = 0;
+
+            var deltaT = DateTime.UtcNow - start;
+            Console.WriteLine($"Total time for generation {generationNumber} : {deltaT.Minutes}:{deltaT.Seconds}:{deltaT.Milliseconds}");
+            Console.WriteLine($"Survivor number : {survivorNumber} - Percent : {survivorPercent} %\n\n");
         }
         return logs.ToString();
     }
 
-    private void GetNextGeneration(int unitLifeTime)
+    private async Task GetNextGenerationAsync(int unitLifeTime, int generationId, int simulationId)
     {
         _units.Clear();
         Brain[] brains;
@@ -72,22 +77,40 @@ public class EnvironmentManager
         for (var index = 0; index < brains.Length; index++)
         {
             var t = brains[index];
-            var newUnit = new Unit(t, GetRandomPosition(), unitLifeTime);
-            _units.Add(newUnit.Identifier, newUnit);
+            var newUnit = new UnitManager(t, GetRandomPosition(), unitLifeTime, generationId, simulationId);
+            _units.Add(newUnit.GetUnit.Identifier, newUnit);
         }
+        var start = DateTime.UtcNow;
+        await _sqlGateway.StoreUnitsAsync(_units.Values.Select(t => t.GetUnit).ToList()).ConfigureAwait(false);
+        var end1 = DateTime.UtcNow;
+        var delta1 = end1 - start;
+        Console.WriteLine($"New units stored : {delta1.Minutes}:{delta1.Seconds}:{delta1.Milliseconds}");
+        await _sqlGateway.StoreUnitBrainsAsync(_units.Values.Select(t => t.GetUnit).ToList()).ConfigureAwait(false);
+        var delta2 = DateTime.UtcNow - end1;
+        Console.WriteLine($"New brains stored : {delta2.Minutes}:{delta2.Seconds}:{delta2.Milliseconds}");
     }
 
-    private void ExecuteGenerationLife()
+    private async Task ExecuteGenerationLifeAsync()
     {
-        var loopCounter = _units.First().Value.LifeTime;
+        var start = DateTime.UtcNow;
+
+        var loopCounter = _units.First().Value.GetUnit.LifeTime;
         for (int i = 0; i < loopCounter; i++)
         {
             foreach (var unit in _units.Values)
-                unit.ExecuteAction();
+                unit.ExecuteAction(i + 1);
         }
+        var end1 = DateTime.UtcNow;
+        var executingTime = end1 - start;
+        Console.WriteLine($"Life execution time: {executingTime.Minutes}:{executingTime.Seconds}:{executingTime.Milliseconds}");
+
+        await _sqlGateway.StoreLifeStepAsync(_units.Values.Select(t => t.GetUnitWithPositions).ToList());
+        var end2 = DateTime.UtcNow;
+        var storingTime = end2 - end1;
+        Console.WriteLine($"Unit steps stored in : {storingTime.Minutes}:{storingTime.Seconds}:{storingTime.Milliseconds}");
     }
     
-    private int SelectBestUnits(float radius, int? maxNumberToTake)
+    private int SelectBestUnitsCircular(float radius, int? maxNumberToTake)
     {
         _selectedBrains.Clear();
         var radiusToReach = radius * radius;
@@ -96,13 +119,13 @@ public class EnvironmentManager
         {
             var squareSum = 0f;
             for (int j = 0; j < StaticSpaceDimension.DimensionNumber; j++)
-                squareSum += (float)Math.Pow(unit.Position.GetCoordinate(j), 2);
-            unitCenterDistances.Add(unit.Identifier, squareSum);
+                squareSum += (float)Math.Pow(unit.GetUnit.Position.GetCoordinate(j), 2);
+            unitCenterDistances.Add(unit.GetUnit.Identifier, squareSum);
         }
         var selectedUnits = unitCenterDistances.OrderBy(t => t.Value).Where(t => t.Value < radiusToReach);
         var survivorNumber = selectedUnits.Count();
         foreach (var unitPair in selectedUnits.Take(maxNumberToTake??survivorNumber))
-            _selectedBrains.Add(_units[unitPair.Key].Brain);
+            _selectedBrains.Add(_units[unitPair.Key].GetUnit.Brain);
 
         return survivorNumber;
     }
@@ -113,28 +136,7 @@ public class EnvironmentManager
         for (int i = 0; i < StaticSpaceDimension.DimensionNumber; i++)
             result[i] = StaticHelper.GetRandomValue(StaticSpaceDimension.SpaceDimensions[i].min, StaticSpaceDimension.SpaceDimensions[i].max);
         return result;
-    }
-    
-    private void StoreGenerationInformation(int generationIndex)
-    {
-        var dict = new Dictionary<int, int>();
-        var storingString = new StringBuilder();
-        
-        //from -1 to count sink outputs
-        for(int i = -1 ; i < _networkCaracteristics.OutputNumber; i++)
-            dict.Add(i,0);
-        foreach (var unit in _units.Values)
-        {
-            var unitOutputs = unit.GetLifeTimeOutputs;
-            foreach (var outputs in unitOutputs.Where(t => t.Value > 0))
-                dict[outputs.Key] += outputs.Value;
-        }
-        foreach (var counter in dict.Values)
-            storingString.Append($"{counter};");
-        storingString.Remove(storingString.Length - 1, 1);
-        _generationsOutputs.Add(generationIndex, storingString.ToString());
-    }
-    
+    }   
     
     
     
@@ -143,7 +145,7 @@ public class EnvironmentManager
         var logs = new StringBuilder();
         foreach (var unit in _units.Values)
         {
-            logs.AppendLine($"{unit.Position.GetCoordinate(0)};{unit.Position.GetCoordinate(1)}");
+            logs.AppendLine($"{unit.GetUnit.Position.GetCoordinate(0)};{unit.GetUnit.Position.GetCoordinate(1)}");
         }
 
         return logs.ToString();
@@ -156,9 +158,9 @@ public class EnvironmentManager
         var survivorNumber = 0;
         foreach (var unit in _units.Values)
         {
-            if (unit.Position.GetCoordinate(0) >= minCoordinateToReach)
+            if (unit.GetUnit.Position.GetCoordinate(0) >= minCoordinateToReach)
             {
-                _selectedBrains.Add(unit.Brain);
+                _selectedBrains.Add(unit.GetUnit.Brain);
                 survivorNumber++;
             }
         }

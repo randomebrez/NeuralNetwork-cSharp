@@ -1,4 +1,4 @@
-﻿namespace NeuralNetwork.Tests;
+﻿namespace NeuralNetwork.Interfaces.Model;
 
 public static class StaticSpaceDimension
 {

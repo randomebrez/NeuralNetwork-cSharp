@@ -1,6 +1,7 @@
 ﻿using NeuralNetwork.Interfaces;
 using NeuralNetwork.Interfaces.Model;
 using NeuralNetwork.Helpers;
+using NeuralNetwork.Implementations;
 
 namespace NeuralNetwork.Managers;
 
@@ -9,13 +10,15 @@ public class PopulationManager : IPopulation
     private HashSet<string> _geneCodes;
     private Dictionary<string, Neuron> _neuronsDict;
     private BrainNeurons _baseNeurons;
+    private DatabaseGateway _sqlGateway;
 
     private readonly NetworkCaracteristics _dimension;
 
-    public PopulationManager(NetworkCaracteristics dimension)
+    public PopulationManager(DatabaseGateway sqlGateway, NetworkCaracteristics dimension)
     {
         _dimension = dimension;
-        Initialyze();
+        _sqlGateway = sqlGateway;
+        InitialyzeAsync().GetAwaiter().GetResult();
     }
 
     public Brain[] GenerateFirstGeneration(int childNumber)
@@ -34,7 +37,9 @@ public class PopulationManager : IPopulation
     {
         var newBrains = new Brain[childNumber];
         var maximumTry = 10;
-        for (int i = 0; i < childNumber; i++)
+        var childrenNumberByBrain = 3;
+        var childrenFromParentNumber = childrenNumberByBrain * selectedBrains.Count() < childNumber ? childrenNumberByBrain * selectedBrains.Count() : childNumber;
+        for (int i = 0; i < childrenFromParentNumber; i++)
         {
             var validBrain = false;
             var currentTry = 0;
@@ -47,6 +52,23 @@ public class PopulationManager : IPopulation
             }
             if (validBrain)
                 newBrains[i] = brain;
+        }
+        if (childrenFromParentNumber < childNumber)
+        {
+            for (int i = childrenFromParentNumber; i < childNumber; i++)
+            {
+                var validBrain = false;
+                var currentTry = 0;
+                var brain = new Brain();
+                while (validBrain == false && currentTry < maximumTry)
+                {
+                    currentTry++;
+                    brain = BrainHelper.GenerateRandomBrain(_dimension, _baseNeurons, _geneCodes.ToList(), _neuronsDict);
+                    validBrain = brain != null;
+                }
+                if (validBrain)
+                    newBrains[i] = brain;
+            }
         }
 
         return newBrains;
@@ -61,13 +83,14 @@ public class PopulationManager : IPopulation
         return mixedGenome.GenerateBrainFromGenome(_baseNeurons, _neuronsDict);
     }
 
-    private void Initialyze()
+    private async Task InitialyzeAsync()
     {
         _neuronsDict = new Dictionary<string, Neuron>();
         _geneCodes = new HashSet<string>();
 
         _baseNeurons = BrainHelper.GetBaseNeurons(_dimension);
         _geneCodes = GetGeneCodes();
+        await _sqlGateway.CreateVerticesAsync(_geneCodes);
 
         foreach (var inputNeuron in _baseNeurons.Inputs)
             _neuronsDict.Add(inputNeuron.UniqueId, inputNeuron);
