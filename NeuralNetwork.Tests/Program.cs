@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Text;
+﻿using System.Text;
 using NeuralNetwork.DataBase.Abstraction;
 using NeuralNetwork.Implementations;
 using NeuralNetwork.Interfaces.Model;
@@ -9,13 +8,15 @@ var start = DateTime.UtcNow;
 
 var logfilepath = @"D:\Codes\Test\neuralTework.txt";
 var sqliteConnectionString = @"D:\Codes\Test\NeuralNetworkDatabase.txt";
-//if (File.Exists(sqliteConnectionString))
-//    File.Delete(sqliteConnectionString);
-//File.Create(sqliteConnectionString);
+var cleanDatabase = true;
 
-if (File.Exists(logfilepath))
-    File.Delete(logfilepath);
 
+var spaceDimensions = new int[] { 50, 50 };
+var maxPopulationNumber = 100;
+var maxNumberOfGeneration = 500;
+var unitLifeTime = 150;
+var selectionRadius = 0.2f;
+int? numberOfBestToSave = null;
 var networkCaracteristics = new NetworkCaracteristics
 {
     GeneNumber = 24,
@@ -25,15 +26,11 @@ var networkCaracteristics = new NetworkCaracteristics
     WeighBytesNumber = 4
 };
 
-var totalNumberOfGenes = (networkCaracteristics.InputNumber + networkCaracteristics.NeutralNumber) *
-                         (networkCaracteristics.OutputNumber + networkCaracteristics.NeutralNumber);
+// PROGRAM
 
-var spaceDimensions = new int[] { 50, 50 };
-var maxPopulationNumber = 100;
-var maxNumberOfGeneration = 500;
-var unitLifeTime = 150;
-var selectionRadius = 0.2f;
-int? numberOfBestToSave = null;
+// File is automatically recreated when instantiating the 'context'
+if (cleanDatabase && File.Exists(sqliteConnectionString))
+    File.Delete(sqliteConnectionString);
 
 var sqlGateway = new DatabaseGateway(new Context(sqliteConnectionString));
 var environmentManager = new EnvironmentManager(sqlGateway, networkCaracteristics, maxPopulationNumber);
@@ -42,6 +39,9 @@ var fileText = environmentManager.ExecuteLifeAsync(spaceDimensions, maxNumberOfG
 
 var delta = DateTime.UtcNow - start;
 Console.WriteLine($"\nSimulation ended in : {delta.Minutes}:{delta.Seconds}:{delta.Milliseconds}");
+
+if (!File.Exists(logfilepath))
+    File.Create(logfilepath);
 
 using (var fileStream = File.OpenWrite(logfilepath))
 {

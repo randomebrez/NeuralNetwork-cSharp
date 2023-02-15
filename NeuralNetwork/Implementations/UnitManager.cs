@@ -37,11 +37,7 @@ namespace NeuralNetwork.Implementations
         public void ExecuteAction(int actionNumber)
         {
             var inputs = GetDistanceToWalls();
-            var inputString = new StringBuilder();
-            for(int i = 0; i < inputs.Length; i++)
-                inputString.Append($"I{i}:{inputs[i]};");
             var result = _brainManager.ComputeOutput(inputs.ToList());
-            StoreOutput(result.ouputId);
             ExecuteOutput(result.ouputId);
             _positions[actionNumber] = _unit.Position.ToString();
             _unit.Age++;
