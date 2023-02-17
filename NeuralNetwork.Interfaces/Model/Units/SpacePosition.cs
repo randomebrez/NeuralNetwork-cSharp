@@ -1,4 +1,6 @@
-﻿namespace NeuralNetwork.Tests.Model;
+﻿using System.Text;
+
+namespace NeuralNetwork.Interfaces.Model;
 
 public class SpacePosition
 {
@@ -30,5 +32,14 @@ public class SpacePosition
         if (values.Length != _dimension)
             throw new Exception($"Parameter length should be equal to dimension : {_dimension}. Here {values.Length}");
         _coordinates = values;
+    }
+
+    public override string ToString()
+    {
+        var result = new StringBuilder();
+        foreach (var coordinate in _coordinates)
+            result.Append($"{coordinate};");
+
+        return result.ToString();
     }
 }

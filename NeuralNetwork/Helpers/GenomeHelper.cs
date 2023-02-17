@@ -9,22 +9,11 @@ namespace NeuralNetwork.Helpers
         public static Genome GenerateGenome(int geneNumber, int weighBytesNumber, List<string> geneCodes)
         {
             var genome = new Genome(geneNumber);
-            var uniqueGenes = new Dictionary<int, bool>();
             for (int i = 0; i < geneNumber; i++)
             {
-                var newIndex = false;
-                var geneCodeRandomIndex = 0;
-                while (!newIndex)
-                {
-                    geneCodeRandomIndex = StaticHelper.GetRandomValue(0, geneCodes.Count - 1);
-                    if (!uniqueGenes.ContainsKey(geneCodeRandomIndex))
-                    {
-                        uniqueGenes.Add(geneCodeRandomIndex, true);
-                        newIndex = true;
-                    }
-                }
-
-                var gene = new Gene(geneCodes[geneCodeRandomIndex], weighBytesNumber);
+                var geneCodeRandomIndex = StaticHelper.GetRandomValue(0, geneCodes.Count - 1);
+                var geneCode = geneCodes[geneCodeRandomIndex];
+                var gene = new Gene(geneCode, weighBytesNumber);
                 gene.RandomizeBytes();
                 genome.Genes[i] = gene;
             }
@@ -35,14 +24,21 @@ namespace NeuralNetwork.Helpers
         {
             var vertices = new List<Vertex>();
             //Read each gene
-            foreach (var gene in genome.Genes)
+            foreach (var geneGroup in genome.Genes.GroupBy(t => t.VertexIdentifier))
             {
-                if (gene.IsActive == false)
-                    continue;
+                Vertex vertex = null;
+                foreach (var gene in geneGroup)
+                {
+                    if (gene.IsActive == false)
+                        continue;
 
-                // Build vertex
-                var vertex = gene.GetVertexEdgesFromGene(availableNeurons);
-                vertices.Add(vertex);
+                    if (vertex == null)
+                        vertex = gene.GetVertexEdgesFromGene(availableNeurons);
+                    else
+                        vertex.Weight *= ComputeVertexWeigh(gene);
+                }
+                if (vertex != null)
+                    vertices.Add(vertex);
             }
 
             return vertices;
@@ -110,6 +106,7 @@ namespace NeuralNetwork.Helpers
 
             return new Vertex
             {
+                Identifier = gene.VertexIdentifier,
                 Origin = availableNeurons[NeuronIdentifiers[0]],
                 Target = availableNeurons[NeuronIdentifiers[1]],
                 Weight = ComputeVertexWeigh(gene)

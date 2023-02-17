@@ -26,4 +26,11 @@ public static class StaticHelper
         var serialized = JsonConvert.SerializeObject(self);
         return JsonConvert.DeserializeObject<T>(serialized);
     }
+
+    public static float Truncate(this float value, int numberOfDigits)
+    {
+        var multiplicator = numberOfDigits * 10;
+        var result = Math.Truncate(multiplicator * value);
+        return (float)result / multiplicator;
+    }
 }
