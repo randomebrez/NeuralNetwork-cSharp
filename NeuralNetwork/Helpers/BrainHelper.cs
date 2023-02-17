@@ -36,6 +36,38 @@ namespace NeuralNetwork.Helpers
             return null;
         }
 
+        public static Brain? GenerateRandomBrainWithMatrix(NetworkCaracteristics dimension, BrainNeurons availableNeurons, List<string> geneCodes, Dictionary<string, Neuron> neuronsDict)
+        {
+            var newBrain = new Brain
+            {
+                Neurons = availableNeurons
+            };
+
+            bool brainValid = true;
+            int maxTry = 10;
+            int currentTry = 0;
+            while (!brainValid && currentTry < maxTry)
+            {
+                currentTry++;
+
+                // Generate genome
+                var genome = GenomeHelper.GenerateGenome(dimension.GeneNumber, dimension.WeighBytesNumber, geneCodes);
+                newBrain.Genome = genome;
+
+                // Translate Genome into vertices
+                newBrain.Matrices = genome.TranslateGenomeToMatrix(dimension, neuronsDict);
+
+                // Check that brain is valid : at least 1 path from an input to an output
+                //brainValid = newBrain.IsBrainValid();
+            }
+
+            if (brainValid)
+                return newBrain;
+
+            Console.WriteLine("Not a valid brain");
+            return null;
+        }
+
         public static Brain GenerateBrainFromGenome(this Genome genome, BrainNeurons availableNeurons, Dictionary<string, Neuron> neuronsDict)
         {
             var newBrain = new Brain
@@ -43,6 +75,22 @@ namespace NeuralNetwork.Helpers
                 Neurons = availableNeurons
             };
             newBrain.Vertices = genome.TranslateGenome(neuronsDict);
+            newBrain.Genome = genome;
+
+            // Check that brain is valid : at least 1 path from an input to an output
+            //var validBrain = newBrain.IsBrainValid();
+
+            return newBrain;
+            //return validBrain ? newBrain : null;
+        }
+
+        public static Brain GenerateBrainFromGenomeWithMatrix(this Genome genome, NetworkCaracteristics dimension, BrainNeurons availableNeurons, Dictionary<string, Neuron> neuronsDict)
+        {
+            var newBrain = new Brain
+            {
+                Neurons = availableNeurons
+            };
+            newBrain.Matrices = genome.TranslateGenomeToMatrix(dimension, neuronsDict);
             newBrain.Genome = genome;
 
             // Check that brain is valid : at least 1 path from an input to an output

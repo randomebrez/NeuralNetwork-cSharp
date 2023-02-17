@@ -26,7 +26,8 @@ public class PopulationManager : IPopulation
         var newBrains = new Brain[childNumber];
         for (int i = 0; i < childNumber; i++)
         {
-            var newBrain = BrainHelper.GenerateRandomBrain(_dimension, _baseNeurons, _geneCodes.ToList(), _neuronsDict);
+            //var newBrain = BrainHelper.GenerateRandomBrain(_dimension, _baseNeurons, _geneCodes.ToList(), _neuronsDict);
+            var newBrain = BrainHelper.GenerateRandomBrainWithMatrix(_dimension, _baseNeurons, _geneCodes.ToList(), _neuronsDict);
             if (newBrain != null)
                 newBrains[i] = newBrain;
         }
@@ -63,7 +64,8 @@ public class PopulationManager : IPopulation
                 while (validBrain == false && currentTry < maximumTry)
                 {
                     currentTry++;
-                    brain = BrainHelper.GenerateRandomBrain(_dimension, _baseNeurons, _geneCodes.ToList(), _neuronsDict);
+                    //brain = BrainHelper.GenerateRandomBrain(_dimension, _baseNeurons, _geneCodes.ToList(), _neuronsDict);
+                    brain = BrainHelper.GenerateRandomBrainWithMatrix(_dimension, _baseNeurons, _geneCodes.ToList(), _neuronsDict);
                     validBrain = brain != null;
                 }
                 if (validBrain)

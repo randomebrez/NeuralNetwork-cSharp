@@ -35,13 +35,36 @@ namespace NeuralNetwork.Helpers
                     if (vertex == null)
                         vertex = gene.GetVertexEdgesFromGene(availableNeurons);
                     else
-                        vertex.Weight *= ComputeVertexWeigh(gene);
+                        vertex.Weight = StaticHelper.Truncate(vertex.Weight * ComputeVertexWeigh(gene), 5);
                 }
                 if (vertex != null)
                     vertices.Add(vertex);
             }
 
             return vertices;
+        }
+
+        public static BrainMatrices TranslateGenomeToMatrix(this Genome genome, NetworkCaracteristics networkCaracteristics, Dictionary<string, Neuron> availableNeurons)
+        {
+            var matrices = new BrainMatrices(networkCaracteristics);
+            //Read each gene
+            foreach (var gene in genome.Genes)
+            {
+                var originId = int.Parse(gene.VertexIdentifier.Split('-')[0].Split(':')[1]);
+                var targetId = int.Parse(gene.VertexIdentifier.Split('-')[1].Split(':')[1]);
+                var targetLayer = gene.VertexIdentifier.Split('-')[1].Split(':')[0];
+                var originLayer = gene.VertexIdentifier.Split('-')[0].Split(':')[0];
+                if (!string.IsNullOrEmpty(targetLayer) && targetLayer == "O")
+                {
+                    originId = originLayer == "I" ? originId : originId + networkCaracteristics.InputNumber;
+                    matrices.OutputMatrix.SetElement(originId, targetId, ComputeVertexWeigh(gene));
+                }
+                else
+                    matrices.NeutralMatrix.SetElement(originId, targetId, ComputeVertexWeigh(gene));
+
+            }
+
+            return matrices;
         }
 
         public static Genome CrossOver(this Genome genomeDtoA, Genome genomeDtoB)
@@ -123,8 +146,9 @@ namespace NeuralNetwork.Helpers
                     continue;
                 weighResult += (float)Math.Pow(2, i);
             }
-            weighResult /= gene.WeightBytesMaxValue;
-            return gene.WeighSign ? weighResult : weighResult * (-1);
+            weighResult = weighResult / gene.WeightBytesMaxValue;
+            var result = gene.WeighSign ? weighResult : weighResult * (-1);
+            return StaticHelper.Truncate(result, 5);
         }
 
         #endregion

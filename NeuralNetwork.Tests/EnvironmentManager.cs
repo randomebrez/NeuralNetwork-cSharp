@@ -92,7 +92,7 @@ public class EnvironmentManager
         var delta1 = end1 - start;
         logs.AppendLine($"New units stored : {delta1.Minutes}:{delta1.Seconds}:{delta1.Milliseconds}");
 
-        await _sqlGateway.StoreUnitBrainsAsync(dbUnits).ConfigureAwait(false);
+        //await _sqlGateway.StoreUnitBrainsAsync(dbUnits).ConfigureAwait(false);
         var delta2 = DateTime.UtcNow - end1;
         logs.AppendLine($"New brains stored : {delta2.Minutes}:{delta2.Seconds}:{delta2.Milliseconds}");
 

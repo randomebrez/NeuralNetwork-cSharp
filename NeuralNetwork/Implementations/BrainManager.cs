@@ -22,6 +22,16 @@ namespace NeuralNetwork.Managers
             return (bestOutput.Id, bestOutput.Value);
         }
 
+        public (int ouputId, float neuronIntensity) ComputeOutputPython(List<float> inputs)
+        {
+            InitialyzeInputNeuronsValue(inputs);
+            ComputeLayer(1);
+            ComputeLayer(2);
+
+            var bestOutput = GetBestOutput();
+            return (bestOutput.Id, bestOutput.Value);
+        }
+
         private void InitialyzeInputNeuronsValue(List<float> inputs)
         {
             for (int i = 0; i < _brain.Neurons.Inputs.Count; i++)

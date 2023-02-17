@@ -12,6 +12,8 @@ public class Brain
 
     public Genome Genome { get; set; }
 
+    public BrainMatrices Matrices { get; set; }
+
     private string _vertexString { get; set; }
 
     public override string ToString()

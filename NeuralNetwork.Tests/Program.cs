@@ -28,8 +28,17 @@ var networkCaracteristics = new NetworkCaracteristics
 
 // PROGRAM
 
-// File is automatically recreated when instantiating the 'context'
-if (cleanDatabase && File.Exists(sqliteConnectionString))
+var p = new int[50];
+var index = 0;
+for (int i = 0; i < 50; i++)
+    p[index++] = i;
+
+for (int i = 0; i < 50; i++)
+    Console.WriteLine($"{i} : {p[i]}");
+
+
+    // File is automatically recreated when instantiating the 'context'
+    if (cleanDatabase && File.Exists(sqliteConnectionString))
     File.Delete(sqliteConnectionString);
 
 var sqlGateway = new DatabaseGateway(new Context(sqliteConnectionString));
