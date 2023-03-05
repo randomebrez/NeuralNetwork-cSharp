@@ -5,12 +5,15 @@ using NeuralNetwork.Interfaces.Model;
 using NeuralNetwork.Tests;
 
 var start = DateTime.UtcNow;
+// config sur fixe
+//var logfilepath = @"D:\Codes\Test\neuralTework.txt";
+//var sqliteConnectionString = @"D:\Codes\Test\NeuralNetworkDatabase.txt";
 
-var logfilepath = @"D:\Codes\Test\neuralTework.txt";
-var sqliteConnectionString = @"D:\Codes\Test\NeuralNetworkDatabase.txt";
-var cleanDatabase = true;
+//Config sur pc portable
+var logfilepath = @"C:\Users\nico-\Documents\Codes\Tests\neuralTework.txt";
+var sqliteConnectionString =  @"C:\Users\nico-\Documents\Codes\Tests\NeuralNetworkDatabase.txt";
 
-
+var cleanDatabase = false;
 var spaceDimensions = new int[] { 50, 50 };
 var maxPopulationNumber = 100;
 var maxNumberOfGeneration = 500;
@@ -19,7 +22,7 @@ var selectionRadius = 0.2f;
 int? numberOfBestToSave = null;
 var networkCaracteristics = new NetworkCaracteristics
 {
-    GeneNumber = 24,
+    GeneNumber = 32,
     InputNumber = 4,
     OutputNumber = 8,
     NeutralNumber = 2,
