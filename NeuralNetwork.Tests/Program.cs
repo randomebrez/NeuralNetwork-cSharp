@@ -6,19 +6,20 @@ using NeuralNetwork.Interfaces.Model;
 using NeuralNetwork.Tests;
 
 var start = DateTime.UtcNow;
+// config sur fixe
+//var logfilepath = @"D:\Codes\Test\neuralTework.txt";
+//var sqliteConnectionString = @"D:\Codes\Test\NeuralNetworkDatabase.txt";
 
-var logfilepath = @"D:\Codes\Test\neuralTework.txt";
-var sqliteConnectionString = @"D:\Codes\Test\NeuralNetworkDatabase.txt";
-//if (File.Exists(sqliteConnectionString))
-//    File.Delete(sqliteConnectionString);
-//File.Create(sqliteConnectionString);
+//Config sur pc portable
+var logfilepath = @"C:\Users\nico-\Documents\Codes\Tests\neuralTework.txt";
+var sqliteConnectionString =  @"C:\Users\nico-\Documents\Codes\Tests\NeuralNetworkDatabase.txt";
 
 if (File.Exists(logfilepath))
     File.Delete(logfilepath);
 
 var networkCaracteristics = new NetworkCaracteristics
 {
-    GeneNumber = 24,
+    GeneNumber = 32,
     InputNumber = 4,
     OutputNumber = 8,
     NeutralNumber = 2,
@@ -29,10 +30,10 @@ var totalNumberOfGenes = (networkCaracteristics.InputNumber + networkCaracterist
                          (networkCaracteristics.OutputNumber + networkCaracteristics.NeutralNumber);
 
 var spaceDimensions = new int[] { 50, 50 };
-var maxPopulationNumber = 100;
+var maxPopulationNumber = 150;
 var maxNumberOfGeneration = 500;
 var unitLifeTime = 150;
-var selectionRadius = 0.2f;
+var selectionRadius = 0.3f;
 int? numberOfBestToSave = null;
 
 var sqlGateway = new DatabaseGateway(new Context(sqliteConnectionString));
