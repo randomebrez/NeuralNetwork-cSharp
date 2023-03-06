@@ -51,14 +51,27 @@ namespace NeuralNetwork.Helpers
         {
             var geneNumber = genomeDtoA.Genes.Length;
             var newGenome = new Genome(geneNumber);
-            for (int i = 0; i < geneNumber; i++)
+            var crossOver = false;
+
+            // First gene is from genome A
+            newGenome.Genes[0] = genomeDtoA.Genes[0];
+            
+            for (int i = 1; i < geneNumber - 1; i++)
             {
-                var getFromA = StaticHelper.GetBooleanValue();
-                if (getFromA)
-                    newGenome.Genes[i] = genomeDtoA.Genes[i];
-                else
+                // While crossOver is false, pick gene from genome A
+                // Once it is false, pick gene from genome B
+                if (!crossOver)
+                    crossOver = StaticHelper.GetBooleanValue();
+
+                if (crossOver)
                     newGenome.Genes[i] = genomeDtoB.Genes[i];
+                else
+                    newGenome.Genes[i] = genomeDtoA.Genes[i];                   
             }
+
+            // Last gene is from genome B
+            newGenome.Genes[geneNumber - 1] = genomeDtoB.Genes[geneNumber - 1];
+
             return newGenome;
         }
         
