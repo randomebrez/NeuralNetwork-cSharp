@@ -14,6 +14,11 @@ namespace NeuralNetwork.Managers
             _brain = brain;
         }
 
+        public Brain GetBrain()
+        {
+            return _brain;
+        }
+
         public (int ouputId, float neuronIntensity) ComputeOutput(List<float> inputs)
         {
             InitialyzeInputNeuronsValue(inputs);
