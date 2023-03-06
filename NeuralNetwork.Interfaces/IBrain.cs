@@ -1,4 +1,6 @@
-﻿namespace NeuralNetwork.Interfaces
+﻿using System.Collections.Generic;
+
+namespace NeuralNetwork.Interfaces
 {
     public interface IBrain
     {

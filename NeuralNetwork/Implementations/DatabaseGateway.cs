@@ -3,6 +3,10 @@ using NeuralNetwork.DataBase.Abstraction;
 using NeuralNetwork.DataBase.Abstraction.Model;
 using NeuralNetwork.Interfaces;
 using NeuralNetwork.Interfaces.Model;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace NeuralNetwork.Implementations
 {
@@ -16,7 +20,7 @@ namespace NeuralNetwork.Implementations
             var itemNumber = elements.Count();
             while (index < itemNumber)
             {
-                Elements.Add(elements.Take(new Range(index, Math.Min(itemNumber, index + bucketSize))));
+                Elements.Add(elements.Skip(index).Take(Math.Min(itemNumber, index + bucketSize)));
                 index += bucketSize;
             }
         }

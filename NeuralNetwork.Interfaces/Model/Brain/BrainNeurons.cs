@@ -1,4 +1,6 @@
-﻿namespace NeuralNetwork.Interfaces.Model
+﻿using System.Collections.Generic;
+
+namespace NeuralNetwork.Interfaces.Model
 {
     public class BrainNeurons
     {

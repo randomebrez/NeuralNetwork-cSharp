@@ -9,7 +9,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuralNetwork.Interfaces", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuralNetwork.Tests", "NeuralNetwork.Tests\NeuralNetwork.Tests.csproj", "{7FF3D9A6-4555-4EE2-B041-E5CEB4E3552B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeuralNetwork.DataBase.Abstraction", "NeuralNetwork.DataBase.Abstraction\NeuralNetwork.DataBase.Abstraction.csproj", "{AE47A18D-6B79-486C-BE9A-07EE90AC6990}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuralNetwork.DataBase.Abstraction", "NeuralNetwork.DataBase.Abstraction\NeuralNetwork.DataBase.Abstraction.csproj", "{AE47A18D-6B79-486C-BE9A-07EE90AC6990}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9444DDE7-224E-450B-B994-9E39A0C225F7}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

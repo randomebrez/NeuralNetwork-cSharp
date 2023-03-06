@@ -1,5 +1,7 @@
 ﻿using NeuralNetwork.Interfaces;
 using NeuralNetwork.Interfaces.Model;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace NeuralNetwork.Managers
 {

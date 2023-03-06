@@ -1,8 +1,11 @@
-﻿namespace NeuralNetwork.Interfaces.Model;
+﻿using System.Collections.Generic;
 
-public static class StaticSpaceDimension
+namespace NeuralNetwork.Interfaces.Model
 {
-    public static Dictionary<int, (int min, int max)> SpaceDimensions { get; set; }
+    public static class StaticSpaceDimension
+    {
+        public static Dictionary<int, (int min, int max)> SpaceDimensions { get; set; }
 
-    public static int DimensionNumber => SpaceDimensions.Count;
+        public static int DimensionNumber => SpaceDimensions.Count;
+    }
 }

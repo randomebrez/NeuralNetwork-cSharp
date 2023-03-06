@@ -1,4 +1,6 @@
-﻿namespace NeuralNetwork.Interfaces.Model
+﻿using System;
+
+namespace NeuralNetwork.Interfaces.Model
 {
     public class Unit
     {
