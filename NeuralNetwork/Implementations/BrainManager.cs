@@ -8,10 +8,13 @@ namespace NeuralNetwork.Managers
     public class BrainManager : IBrain
     {
         private readonly Brain _brain;
+        private readonly int _outputLayerId;
 
         public BrainManager(Brain brain)
         {
             _brain = brain;
+            _outputLayerId = brain.Neurons.Outputs.First().Layer;
+
         }
 
         public Brain GetBrain()
@@ -22,8 +25,8 @@ namespace NeuralNetwork.Managers
         public (int ouputId, float neuronIntensity) ComputeOutput(List<float> inputs)
         {
             InitialyzeInputNeuronsValue(inputs);
-            ComputeLayer(1);
-            ComputeLayer(2);
+            for(int i = 1; i <= _outputLayerId; i++)
+                ComputeLayer(i);
 
             var bestOutput = GetBestOutput();
             return (bestOutput.Id, bestOutput.Value);

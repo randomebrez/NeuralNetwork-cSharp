@@ -61,7 +61,7 @@ namespace NeuralNetwork.Helpers
                 // While crossOver is false, pick gene from genome A
                 // Once it is false, pick gene from genome B
                 if (!crossOver)
-                    crossOver = StaticHelper.GetBooleanValue();
+                   crossOver = StaticHelper.GetBooleanValue();
 
                 if (crossOver)
                     newGenome.Genes[i] = genomeDtoB.Genes[i];

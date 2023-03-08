@@ -104,26 +104,24 @@ namespace NeuralNetwork.Managers
         private HashSet<string> GetGeneCodes()
         {
             var geneCodes = new HashSet<string>();
-            for (int i = 0; i < _dimension.InputNumber; i++)
+            for (int i = 0; i < _dimension.NeutralNumbers.Count(); i++)
             {
-                for (int j = 0; j < _dimension.NeutralNumber; j++)
+                for (int j = 0; j < _dimension.NeutralNumbers[i]; j++)
                 {
-                    geneCodes.Add($"I:{i}-N:{j}");
-                }
-                for (int k = 0; k < _dimension.OutputNumber; k++)
-                {
-                    geneCodes.Add($"I:{i}-O:{k}");
-                }
-            }
-            for (int i = 0; i < _dimension.NeutralNumber; i++)
-            {
-                //for (int j = 0; j < _dimension.NeutralNumber; j++)
-                //{
-                //    geneCodes.Add($"N:{i}-N:{j}");
-                //}
-                for (int k = 0; k < _dimension.OutputNumber; k++)
-                {
-                    geneCodes.Add($"N:{i}-O:{k}");
+                    // Input links
+                    for (int input = 0; input < _dimension.InputNumber; input++)
+                        geneCodes.Add($"I:{input}-N{i+1}:{j}");
+
+                    // Output links
+                    for (int output = 0; output < _dimension.OutputNumber; output++)
+                        geneCodes.Add($"N{i + 1}:{j}-O:{output}");
+
+                    // Other neutral layers links
+                    for (int neutralLayer = i+1; neutralLayer < _dimension.NeutralNumbers.Count(); neutralLayer++)
+                    {
+                        for (int neutral = 0; neutral < _dimension.NeutralNumbers[neutralLayer]; neutral++)
+                            geneCodes.Add($"N{i+1}:{j}-N{neutralLayer+1}:{neutral}");
+                    }
                 }
             }
 

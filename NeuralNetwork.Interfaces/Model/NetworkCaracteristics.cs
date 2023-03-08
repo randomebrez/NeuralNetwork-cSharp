@@ -1,10 +1,17 @@
-﻿namespace NeuralNetwork.Interfaces.Model
+﻿using System.Collections.Generic;
+
+namespace NeuralNetwork.Interfaces.Model
 {
     public class NetworkCaracteristics
     {
+        public NetworkCaracteristics()
+        {
+            NeutralNumbers= new List<int>();
+        }
+
         public int InputNumber { get; set; }
 
-        public int NeutralNumber { get; set; }
+        public List<int> NeutralNumbers { get; set; }
 
         public int OutputNumber { get; set; }
 

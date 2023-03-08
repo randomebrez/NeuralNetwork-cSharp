@@ -77,11 +77,14 @@ namespace NeuralNetwork.Helpers
             for (int i = 0; i < dimension.InputNumber; i++)
                 result.Inputs.Add(new NeuronInput(i, 0));
 
-            for (int j = 0; j < dimension.NeutralNumber; j++)
-                result.Neutrals.Add(new NeuronNeutral(j, 1));
+            for (int j = 0; j < dimension.NeutralNumbers.Count(); j++)
+            {
+                for (int i = 0; i < dimension.NeutralNumbers[j]; i++)
+                    result.Neutrals.Add(new NeuronNeutral(i, j+1));
+            }
 
             for (int k = 0; k < dimension.OutputNumber; k++)
-                result.Outputs.Add(new NeuronOutput(k, 2));
+                result.Outputs.Add(new NeuronOutput(k, 1 + dimension.NeutralNumbers.Count()));
 
             return result;
         }

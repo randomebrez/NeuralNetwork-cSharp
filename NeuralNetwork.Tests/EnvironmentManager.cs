@@ -43,7 +43,7 @@ namespace NeuralNetwork.Tests
             var successCount = 0;
 
             //Loop on generations
-            while (successCount < 1 && generationNumber < maxNumberOfGeneration)
+            while (successCount < 5 && generationNumber < maxNumberOfGeneration)
             {
                 var currentLog = new StringBuilder();
                 var start = DateTime.UtcNow;
@@ -58,9 +58,8 @@ namespace NeuralNetwork.Tests
                 var survivorNumber = SelectBestUnitsCircular(selectionRadius * StaticSpaceDimension.SpaceDimensions[0].max, nubmberOfBestToSave);
                 //var survivorNumber = SelectBestUnitsLateral(0.1f);
 
-                generationNumber++;
                 var survivorPercent = 100 * ((float)survivorNumber / (float)_maxPopulationNumber);
-                if (survivorPercent > 80)
+                if (survivorPercent > 85)
                     successCount++;
                 else
                     successCount = 0;
@@ -70,6 +69,8 @@ namespace NeuralNetwork.Tests
                 currentLog.AppendLine($"Survivor number : {survivorNumber} - Percent : {survivorPercent} %\n\n");
                 Console.WriteLine(currentLog.ToString());
                 logs.AppendLine(currentLog.ToString());
+
+                generationNumber++;
             }
             return logs.ToString();
         }

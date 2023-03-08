@@ -4,10 +4,11 @@ namespace NeuralNetwork.Interfaces.Model
 {
     public abstract class Neuron
     {
-        public Neuron(int id, int layerId)
+        public Neuron(int id, int layerId, float treshold = 0.1f)
         {
             Id = id;
             Layer = layerId;
+            Treshold = treshold;
         }
 
         public int Id { get; private set; }
@@ -22,12 +23,12 @@ namespace NeuralNetwork.Interfaces.Model
 
         public int Layer { get; set; }
 
-        public virtual float ActivationFunction(float threshold = 0.1f)
-        {
-            if (Value < threshold)
-                Value = 0;
+        public float Treshold { get; set; }
 
-            return Value;
+        public virtual void ActivationFunction()
+        {
+            if (Value < Treshold)
+                Value = 0;
         }
     }
 
@@ -50,17 +51,18 @@ namespace NeuralNetwork.Interfaces.Model
         {
         }
 
-        public override string UniqueId => $"N:{Id}";
+        public override string UniqueId => $"N{Layer}:{Id}";
 
         public override bool CanBeOrigin { get => true; }
 
         public override bool CanBeTarget { get => true; }
 
         //tanh pour les neurones internes
-        public override float ActivationFunction(float threshold = 0f)
+        public override void ActivationFunction()
         {
             var expo = Math.Exp(-2 * Value);
-            return (float)((1 - expo) / (1 + expo));
+            var result = (float)((1 - expo) / (1 + expo));
+            Value = result < Treshold ? 0 : result;
         }
     }
 
@@ -77,10 +79,11 @@ namespace NeuralNetwork.Interfaces.Model
         public string ActionType { get; set; }
         
         //sigmoid for output neurons
-        public override float ActivationFunction(float threshold = 0f)
+        public override void ActivationFunction()
         {
             var expo = Math.Exp(-Value);
-            return (float)(1 / (1 + expo));
+            var result = (float)(1 / (1 + expo));
+            Value = result < Treshold ? 0 : result;
         }
     }
 }

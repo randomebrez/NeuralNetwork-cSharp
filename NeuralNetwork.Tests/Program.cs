@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using NeuralNetwork.DataBase.Abstraction;
@@ -29,10 +30,10 @@ internal class program
         int? numberOfBestToSave = null;
         var networkCaracteristics = new NetworkCaracteristics
         {
-            GeneNumber = 20,
+            GeneNumber = 60,
             InputNumber = 4,
             OutputNumber = 8,
-            NeutralNumber = 2,
+            NeutralNumbers = new List<int> { 2, 2 },
             WeighBytesNumber = 4
         };
 
