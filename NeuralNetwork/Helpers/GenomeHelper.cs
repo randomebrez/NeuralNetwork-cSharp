@@ -23,7 +23,7 @@ namespace NeuralNetwork.Helpers
             return genome;
         }
 
-        public static List<Vertex> TranslateGenome(this Genome genome, Dictionary<string, Neuron> availableNeurons)
+        public static List<Vertex> TranslateGenome(this Genome genome, BrainNeurons neurons)
         {
             var vertices = new List<Vertex>();
             //Read each gene
@@ -36,7 +36,7 @@ namespace NeuralNetwork.Helpers
                         continue;
 
                     if (vertex == null)
-                        vertex = gene.GetVertexEdgesFromGene(availableNeurons);
+                        vertex = gene.GetVertexEdgesFromGene(neurons);
                     else
                         vertex.Weight *= ComputeVertexWeigh(gene);
                 }
@@ -52,6 +52,8 @@ namespace NeuralNetwork.Helpers
             var geneNumber = genomeDtoA.Genes.Length;
             var newGenome = new Genome(geneNumber);
             var crossOver = false;
+            // Binomial law with average of first success around (GeneLength/2) : Loi de poisson
+            var crossOverTreshold = 2f / geneNumber;
 
             // First gene is from genome A
             newGenome.Genes[0] = genomeDtoA.Genes[0];
@@ -61,18 +63,18 @@ namespace NeuralNetwork.Helpers
                 // While crossOver is false, pick gene from genome A
                 // Once it is false, pick gene from genome B
                 if (!crossOver)
-                   crossOver = StaticHelper.GetBooleanValue();
+                   crossOver = StaticHelper.GetUniformProbability(100 * geneNumber) < crossOverTreshold;
 
                 if (crossOver)
                     newGenome.Genes[i] = genomeDtoB.Genes[i];
                 else
-                    newGenome.Genes[i] = genomeDtoA.Genes[i];                   
+                    newGenome.Genes[i] = genomeDtoA.Genes[i];
             }
 
             // Last gene is from genome B
             newGenome.Genes[geneNumber - 1] = genomeDtoB.Genes[geneNumber - 1];
 
-            return newGenome;
+            return newGenome.DeepCopy();
         }
         
 
@@ -100,11 +102,11 @@ namespace NeuralNetwork.Helpers
         {
             foreach (var gene in genome.Genes)
             {
-                var mutationOccur = StaticHelper.GetUniformProbability() < mutationRate;
+                var mutationOccur = StaticHelper.GetUniformProbability((int)(100 / mutationRate)) < mutationRate;
                 if (mutationOccur == false)
                     continue;
 
-                if (StaticHelper.GetUniformProbability() < geneChangeProbability)
+                if (StaticHelper.GetUniformProbability((int)(100 / mutationRate)) < geneChangeProbability)
                 {
                     var geneCodeRandomIndex = StaticHelper.GetRandomValue(0, geneCodes.Count - 1);
                     var newGene = new Gene(geneCodes[geneCodeRandomIndex], 4);
@@ -116,15 +118,15 @@ namespace NeuralNetwork.Helpers
             }
         }
 
-        private static Vertex GetVertexEdgesFromGene(this Gene gene, Dictionary<string, Neuron> availableNeurons)
+        private static Vertex GetVertexEdgesFromGene(this Gene gene, BrainNeurons neurons)
         {
             var NeuronIdentifiers = gene.VertexIdentifier.Split('-');
 
             return new Vertex
             {
                 Identifier = gene.VertexIdentifier,
-                Origin = availableNeurons[NeuronIdentifiers[0]],
-                Target = availableNeurons[NeuronIdentifiers[1]],
+                Origin = neurons.GetNeuronByName(NeuronIdentifiers[0]),
+                Target = neurons.GetNeuronByName(NeuronIdentifiers[1]),
                 Weight = ComputeVertexWeigh(gene)
             };
         }

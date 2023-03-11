@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Collections.Generic;
+using System;
 
 namespace NeuralNetwork.Interfaces.Model
 {
@@ -7,11 +8,19 @@ namespace NeuralNetwork.Interfaces.Model
     {
         public int Id { get; set; }
 
+        public Guid UniqueIdentifier { get; set; }
+
         public BrainNeurons Neurons { get; set; }
 
         public List<Vertex> Vertices { get; set; }
 
         public Genome Genome { get; set; }
+
+        public Guid FirstParent { get; set; }
+
+        public Guid SecondParent { get; set; }
+
+        public int UseForChildCounter { get; set; }
 
         private string _vertexString { get; set; }
 

@@ -7,67 +7,58 @@ namespace NeuralNetwork.Helpers
 {
     public static class BrainHelper
     {
-        public static Brain? GenerateRandomBrain(NetworkCaracteristics dimension, BrainNeurons availableNeurons, List<string> geneCodes, Dictionary<string, Neuron> neuronsDict)
+        public static Brain? GenerateRandomBrain(NetworkCaracteristics dimension, BrainNeurons availableNeurons, List<string> geneCodes)
         {
             var newBrain = new Brain
             {
+                UniqueIdentifier = Guid.NewGuid(),
                 Neurons = availableNeurons
             };
 
-            bool brainValid = false;
-            int maxTry = 10;
-            int currentTry = 0;
-            while (!brainValid && currentTry < maxTry)
-            {
-                currentTry++;
+            // Generate genome
+            var genome = GenomeHelper.GenerateGenome(dimension.GeneNumber, dimension.WeighBytesNumber, geneCodes);
+            newBrain.Genome = genome;
 
-                // Generate genome
-                var genome = GenomeHelper.GenerateGenome(dimension.GeneNumber, dimension.WeighBytesNumber, geneCodes);
-                newBrain.Genome = genome;
+            // Translate Genome into vertices
+            newBrain.Vertices = genome.TranslateGenome(newBrain.Neurons);
 
-                // Translate Genome into vertices
-                newBrain.Vertices = genome.TranslateGenome(neuronsDict);
-
-                // Check that brain is valid : at least 1 path from an input to an output
-                brainValid = newBrain.IsBrainValid();
-            }
-
-            if (brainValid)
+            // Check that brain is valid : at least 1 path from an input to an output
+            if (newBrain.IsBrainValid())
                 return newBrain;
 
-            Console.WriteLine("Not a valid brain");
             return null;
         }
 
-        public static Brain GenerateBrainFromGenome(this Genome genome, BrainNeurons availableNeurons, Dictionary<string, Neuron> neuronsDict)
+        public static Brain GenerateBrainFromGenome(this Genome genome, BrainNeurons availableNeurons, Guid parentA, Guid parentB)
         {
             var newBrain = new Brain
             {
-                Neurons = availableNeurons
+                UniqueIdentifier = Guid.NewGuid(),
+                Neurons = availableNeurons,
+                FirstParent = parentA,
+                SecondParent = parentB
             };
-            newBrain.Vertices = genome.TranslateGenome(neuronsDict);
+            newBrain.Vertices = genome.TranslateGenome(newBrain.Neurons);
             newBrain.Genome = genome;
-
-            // Check that brain is valid : at least 1 path from an input to an output
-            //var validBrain = newBrain.IsBrainValid();
+            //Check BrainValid
 
             return newBrain;
-            //return validBrain ? newBrain : null;
         }
 
         public static bool IsBrainValid(this Brain brain)
         {
-            // Vertices whose target is an 'output'
-            var outputTargeted = brain.Vertices.Where(t => t.Target.Layer == 2).ToList();
-            // If any whose origin is an 'input' : OK
-            if (outputTargeted.Any(t => t.Origin.Layer == 0))
-                return true;
-            // If neither whose origin is an 'neutral' : NOK
-            if (outputTargeted.Any(t => t.Origin.Layer == 1) == false)
-                return false;
-            // Is any vertex whose origin is an 'input' && target is one of the 'neutral' that targets an 'output'
-            var neutralToReach = outputTargeted.Select(t => t.Origin.UniqueId).ToHashSet();
-            return brain.Vertices.Where(t => t.Origin.Layer == 0).Any(t => neutralToReach.Contains(t.Target.UniqueId));
+            return true;
+            //// Vertices whose target is an 'output'
+            //var outputTargeted = brain.Vertices.Where(t => t.Target.Layer == 2).ToList();
+            //// If any whose origin is an 'input' : OK
+            //if (outputTargeted.Any(t => t.Origin.Layer == 0))
+            //    return true;
+            //// If neither whose origin is an 'neutral' : NOK
+            //if (outputTargeted.Any(t => t.Origin.Layer == 1) == false)
+            //    return false;
+            //// Is any vertex whose origin is an 'input' && target is one of the 'neutral' that targets an 'output'
+            //var neutralToReach = outputTargeted.Select(t => t.Origin.UniqueId).ToHashSet();
+            //return brain.Vertices.Where(t => t.Origin.Layer == 0).Any(t => neutralToReach.Contains(t.Target.UniqueId));
         }
 
         public static BrainNeurons GetBaseNeurons(NetworkCaracteristics dimension)
