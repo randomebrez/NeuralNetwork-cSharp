@@ -28,7 +28,7 @@ namespace NeuralNetwork.Tests
             _networkCaracteristics = networkCaracteristics;
         }
 
-        public async Task<string> ExecuteLifeAsync(int[] spaceDimensions, int maxNumberOfGeneration, int unitLifeTime, float selectionRadius, int? nubmberOfBestToSave)
+        public async Task<string> ExecuteLifeAsync(int[] spaceDimensions, int maxNumberOfGeneration, int unitLifeTime, float selectionRadius, int numberOfBestToTake)
         {
             var logs = new StringBuilder();
             var simulationId = await _sqlGateway.AddNewSimulationAsync();
@@ -43,23 +43,23 @@ namespace NeuralNetwork.Tests
             var successCount = 0;
 
             //Loop on generations
-            while (successCount < 5 && generationNumber < maxNumberOfGeneration)
+            while (successCount < 3 && generationNumber < maxNumberOfGeneration)
             {
                 var currentLog = new StringBuilder();
                 var start = DateTime.UtcNow;
                 currentLog.AppendLine($"Starting Generation {generationNumber}");
                 // Get the population
-                currentLog.Append(await GetNextGenerationAsync(unitLifeTime, generationNumber + 1, simulationId).ConfigureAwait(false));
+                currentLog.Append(await GetNextGenerationAsync(unitLifeTime, generationNumber, simulationId).ConfigureAwait(false));
 
                 //Make them live
                 currentLog.AppendLine(await ExecuteGenerationLifeAsync().ConfigureAwait(false));
 
                 //Select The Best
-                var survivorNumber = SelectBestUnitsCircular(selectionRadius * StaticSpaceDimension.SpaceDimensions[0].max, nubmberOfBestToSave);
+                var survivorNumber = SelectBestUnitsCircular(selectionRadius * StaticSpaceDimension.SpaceDimensions[0].max, numberOfBestToTake);
                 //var survivorNumber = SelectBestUnitsLateral(0.1f);
 
                 var survivorPercent = 100 * ((float)survivorNumber / (float)_maxPopulationNumber);
-                if (survivorPercent > 85)
+                if (survivorPercent > 98)
                     successCount++;
                 else
                     successCount = 0;
@@ -87,8 +87,9 @@ namespace NeuralNetwork.Tests
                 brains = _populationManager.GenerateFirstGeneration(_maxPopulationNumber);
             for (var index = 0; index < brains.Length; index++)
             {
-                var t = brains[index];
-                var newUnit = new UnitManager(t, GetRandomPosition(), unitLifeTime, generationId, simulationId);
+                if (brains[index] == null)
+                    continue;
+                var newUnit = new UnitManager(brains[index], GetRandomPosition(), unitLifeTime, generationId, simulationId);
                 _units.Add(newUnit.GetUnit.Identifier, newUnit);
             }
             var dbUnits = _units.Values.Select(t => t.GetUnit).ToList();
@@ -131,7 +132,8 @@ namespace NeuralNetwork.Tests
         private int SelectBestUnitsCircular(float radius, int? maxNumberToTake)
         {
             _selectedBrains.Clear();
-            var radiusToReach = radius * radius;
+            var radiusToReach = 8000;
+            var radiusforSurvivor = radius * radius;
             var unitCenterDistances = new Dictionary<Guid, float>();
             foreach (var unit in _units.Values)
             {
@@ -141,10 +143,12 @@ namespace NeuralNetwork.Tests
                 unitCenterDistances.Add(unit.GetUnit.Identifier, squareSum);
             }
             var selectedUnits = unitCenterDistances.OrderBy(t => t.Value).Where(t => t.Value < radiusToReach);
-            var survivorNumber = selectedUnits.Count();
+            var survivorNumber = unitCenterDistances.Where(t => t.Value < radiusforSurvivor).Count();
             foreach (var unitPair in selectedUnits.Take(maxNumberToTake ?? survivorNumber))
                 _selectedBrains.Add(_units[unitPair.Key].GetUnit.Brain);
 
+            if (selectedUnits.Any())
+                Console.WriteLine($"High score = {selectedUnits.First().Value}");
             return survivorNumber;
         }
 
