@@ -36,6 +36,7 @@ namespace NeuralNetwork.Interfaces.Model
     {
         public NeuronInput(int id, int layerId) : base(id, layerId)
         {
+            Treshold = 0;
         }
 
         public override string UniqueId => $"I:{Id}";
@@ -62,7 +63,7 @@ namespace NeuralNetwork.Interfaces.Model
         {
             var expo = Math.Exp(-2 * Value);
             var result = (float)((1 - expo) / (1 + expo));
-            Value = result < Treshold ? 0 : result;
+            Value = result;
         }
     }
 
