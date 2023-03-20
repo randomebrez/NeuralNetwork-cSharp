@@ -8,5 +8,7 @@ namespace NeuralNetwork.Interfaces
         public (int ouputId, float neuronIntensity) ComputeOutput(List<float> inputs);
 
         public Brain GetBrain();
+
+        public Dictionary<int, float> ComputeOuputs(List<float> inputs);
     }
 }

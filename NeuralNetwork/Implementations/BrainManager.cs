@@ -32,6 +32,18 @@ namespace NeuralNetwork.Managers
             return (bestOutput.Id, bestOutput.Value);
         }
 
+        public Dictionary<int, float> ComputeOuputs(List<float> inputs)
+        {
+            var result = new Dictionary<int, float>();
+            InitialyzeInputNeuronsValue(inputs);
+            for (int i = 1; i <= _outputLayerId; i++)
+                ComputeLayer(i);
+            foreach(var output in _brain.Neurons.Outputs)
+                result.Add(output.Id, output.Value);
+
+            return result;
+        }
+
         private void InitialyzeInputNeuronsValue(List<float> inputs)
         {
             for (int i = 0; i < _brain.Neurons.Inputs.Count; i++)
