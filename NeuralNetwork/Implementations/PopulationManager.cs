@@ -46,9 +46,16 @@ namespace NeuralNetwork.Managers
             while (currentBrainCount < childNumber && selectedBrains.Count > 1)
             {
                 newBrains[currentBrainCount] = GetChild(selectedBrains);
-                selectedBrains = selectedBrains.Where(t => t.UseForChildCounter < _childrenNumberByBrain).ToList();
+                selectedBrains = selectedBrains.Where(t => t.UseForChildCounter < t.MaxChildNumber).ToList();
                 currentBrainCount++;
             }
+            var bestBrains = selectedBrains.OrderByDescending(t => t.MaxChildNumber).ToList();
+            var brainsToComplete = MathF.Min(childNumber - currentBrainCount, bestBrains.Count);
+            for(int i = 0; i < brainsToComplete; i++)
+            {   
+                newBrains[currentBrainCount] = bestBrains[i];
+                currentBrainCount++;
+            }    
             for (int i = currentBrainCount; i < childNumber; i++)
                 newBrains[i] = GenerateRandomBrain();
             return newBrains;

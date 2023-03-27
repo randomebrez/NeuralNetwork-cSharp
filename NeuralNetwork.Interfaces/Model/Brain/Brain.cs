@@ -22,6 +22,8 @@ namespace NeuralNetwork.Interfaces.Model
 
         public int UseForChildCounter { get; set; }
 
+        public int MaxChildNumber { get; set; } = 3;
+
         private string _vertexString { get; set; }
 
         public override string ToString()
