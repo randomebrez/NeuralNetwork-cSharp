@@ -55,7 +55,9 @@ namespace NeuralNetwork.Implementations
                         Genome = brain.Genome.ToString(),
                         Score = brain.Score,
                         UniqueId = brain.UniqueIdentifier.ToString(),
-                        SimulationId = simulationId
+                        SimulationId = simulationId,
+                        ParentA = brain.ParentC.ToString(),
+                        ParentB = brain.ParentB.ToString()
                     };
                     dbBrains.Add(dbBrain);
                 }

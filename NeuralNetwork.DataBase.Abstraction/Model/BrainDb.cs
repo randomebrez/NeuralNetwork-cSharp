@@ -15,6 +15,12 @@ namespace NeuralNetwork.DataBase.Abstraction.Model
         [Column("brain_unique_id"), Required]
         public string UniqueId { get; set; }
 
+        [Column("parentA_unique_id"), Required]
+        public string ParentA { get; set; }
+
+        [Column("parentB_unique_id"), Required]
+        public string ParentB { get; set; }
+
         [Column("genome"), Required]
         public string Genome { get; set; }
 

@@ -16,9 +16,9 @@ namespace NeuralNetwork.Interfaces.Model
 
         public Genome Genome { get; set; }
 
-        public Guid FirstParent { get; set; }
+        public Guid ParentC { get; set; }
 
-        public Guid SecondParent { get; set; }
+        public Guid ParentB { get; set; }
 
         public float Score { get; set; }
 
