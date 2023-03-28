@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using NeuralNetwork.Database;
 using NeuralNetwork.DataBase.Abstraction;
-using NeuralNetwork.DataBase.Abstraction.Model;
+using NeuralNetwork.Helpers;
 using NeuralNetwork.Interfaces;
 using NeuralNetwork.Interfaces.Model;
 using System;
@@ -10,70 +10,30 @@ using System.Threading.Tasks;
 
 namespace NeuralNetwork.Implementations
 {
-    public class BucketList<T>
-    {
-        public List<IEnumerable<T>> Elements { get; private set; }
-        public BucketList(IEnumerable<T> elements, int bucketSize = 2000)
-        {
-            Elements = new List<IEnumerable<T>>();
-            var index = 0;
-            var itemNumber = elements.Count();
-            while (index < itemNumber)
-            {
-                Elements.Add(elements.Skip(index).Take(Math.Min(itemNumber, index + bucketSize)));
-                index += bucketSize;
-            }
-        }
-    }
-
     public class DatabaseGateway : IDatabaseGateway
     {
-        private readonly Context _context;
-        public DatabaseGateway(Context context)
+        private IDatabaseStorage _dbGateway;
+
+        public DatabaseGateway(string sqlFilePath)
         {
-            context.Database.EnsureCreated();
-            _context = context;
+            _dbGateway = new DatabaseStorage(sqlFilePath);
         }
 
         public async Task<int> AddNewSimulationAsync()
         {
-            var newSimulation = _context.Simulations.Add(new SimulationDb());
-            await _context.SaveChangesAsync().ConfigureAwait(false);
-            return newSimulation.Entity.Id;
+            return await _dbGateway.AddNewSimulationAsync().ConfigureAwait(false);
         }
 
-        public async Task StoreBrainsAsync(List<Brain> brains, int simulationId)
+        public async Task StoreBrainsAsync(int simulationId, int generationId, List<Brain> brains)
         {
             try
             {
-                var dbBrains = new List<BrainDb>();
-                for(int i = 0; i < brains.Count(); i++)
-                {
-                    var brain = brains[i];
-                    var dbBrain = new BrainDb
-                    {
-                        Genome = brain.Genome.ToString(),
-                        Score = brain.Score,
-                        UniqueId = brain.UniqueIdentifier.ToString(),
-                        SimulationId = simulationId,
-                        ParentA = brain.ParentC.ToString(),
-                        ParentB = brain.ParentB.ToString()
-                    };
-                    dbBrains.Add(dbBrain);
-                }
-                await _context.Brains.AddRangeAsync(dbBrains).ConfigureAwait(false);
-                await _context.SaveChangesAsync().ConfigureAwait(false);
-                ClearChangeTracker();
+                await _dbGateway.StoreBrainsAsync(brains.Select(t => t.ToDb(simulationId, generationId)).ToList());                
             }
             catch (Exception ex)
             {
                 throw new Exception($"Something went wrong while adding unit brains", ex);
             }
-        }
-
-        private void ClearChangeTracker()
-        {
-            _context.ChangeTracker.Clear();
         }
     }
 }

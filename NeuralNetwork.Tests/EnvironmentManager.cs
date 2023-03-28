@@ -94,7 +94,7 @@ namespace NeuralNetwork.Tests
             var dbUnits = _units.Values.Select(t => t.GetUnit).ToList();
 
             var start = DateTime.UtcNow;
-            await _sqlGateway.StoreBrainsAsync(dbUnits.Select(t => t.Brain).ToList(), simulationId).ConfigureAwait(false);
+            await _sqlGateway.StoreBrainsAsync(simulationId, generationId, dbUnits.Select(t => t.Brain).ToList()).ConfigureAwait(false);
             var delta2 = DateTime.UtcNow - start;
             logs.AppendLine($"New brains stored : {delta2.Minutes}:{delta2.Seconds}:{delta2.Milliseconds}");
 

@@ -6,6 +6,8 @@ namespace NeuralNetwork.Interfaces
 {
     public interface IDatabaseGateway
     {
-        Task StoreBrainsAsync(List<Brain> genomes, int simulationId);
+        Task StoreBrainsAsync(int simulationId, int generationId, List<Brain> brains);
+
+        Task<int> AddNewSimulationAsync();
     }
 }

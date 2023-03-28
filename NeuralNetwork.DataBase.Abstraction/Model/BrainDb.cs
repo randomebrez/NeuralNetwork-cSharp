@@ -12,6 +12,9 @@ namespace NeuralNetwork.DataBase.Abstraction.Model
         [Column("simulation_id"), Required]
         public int SimulationId { get; set; }
 
+        [Column("generation_id"), Required]
+        public int GenerationId { get; set; }
+
         [Column("brain_unique_id"), Required]
         public string UniqueId { get; set; }
 

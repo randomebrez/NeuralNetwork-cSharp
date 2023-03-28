@@ -42,7 +42,7 @@ internal class program
         if (cleanDatabase && File.Exists(sqliteConnectionString))
             File.Delete(sqliteConnectionString);
         
-        var sqlGateway = new DatabaseGateway(new Context(sqliteConnectionString));
+        var sqlGateway = new DatabaseGateway(sqliteConnectionString);
         var environmentManager = new EnvironmentManager(sqlGateway, networkCaracteristics, maxPopulationNumber);
         
         var fileText = environmentManager.ExecuteLifeAsync(spaceDimensions, maxNumberOfGeneration, unitLifeTime, selectionRadius, 1 + 2 * maxPopulationNumber / 3).GetAwaiter().GetResult();

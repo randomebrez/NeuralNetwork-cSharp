@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NeuralNetwork.DataBase.Abstraction\NeuralNetwork.DataBase.Abstraction.csproj" />
+    <ProjectReference Include="..\NeuralNetwork.Database\NeuralNetwork.Database.csproj" />
     <ProjectReference Include="..\NeuralNetwork.Interfaces\NeuralNetwork.Interfaces.csproj" />
   </ItemGroup>
 
