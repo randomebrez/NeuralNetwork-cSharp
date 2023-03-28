@@ -20,7 +20,7 @@ namespace NeuralNetwork.Helpers
             newBrain.Genome = genome;
 
             // Translate Genome into vertices
-            newBrain.Vertices = genome.TranslateGenome(newBrain.Neurons);
+            newBrain.Edges = genome.TranslateGenome(newBrain.Neurons);
 
             // Check that brain is valid : at least 1 path from an input to an output
             if (newBrain.IsBrainValid())
@@ -38,7 +38,7 @@ namespace NeuralNetwork.Helpers
                 FirstParent = parentA,
                 SecondParent = parentB
             };
-            newBrain.Vertices = genome.TranslateGenome(newBrain.Neurons);
+            newBrain.Edges = genome.TranslateGenome(newBrain.Neurons);
             newBrain.Genome = genome;
             //Check BrainValid
 

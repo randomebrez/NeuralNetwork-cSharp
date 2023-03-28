@@ -12,7 +12,7 @@ namespace NeuralNetwork.Interfaces.Model
 
         public BrainNeurons Neurons { get; set; }
 
-        public List<Vertex> Vertices { get; set; }
+        public List<Edge> Edges { get; set; }
 
         public Genome Genome { get; set; }
 
@@ -20,23 +20,25 @@ namespace NeuralNetwork.Interfaces.Model
 
         public Guid SecondParent { get; set; }
 
+        public float Score { get; set; }
+
         public int UseForChildCounter { get; set; }
 
         public int MaxChildNumber { get; set; } = 3;
 
-        private string _vertexString { get; set; }
+        private string _edgesString { get; set; }
 
         public override string ToString()
         {
-            if (string.IsNullOrEmpty(_vertexString))
+            if (string.IsNullOrEmpty(_edgesString))
             {
                 var str = new StringBuilder();
-                foreach (var vertex in Vertices)
-                    str.Append($";{vertex.Origin.Id}{vertex.Target.Id}{vertex.Weight}");
+                foreach (var edge in Edges)
+                    str.Append($";{edge.Origin.Id}{edge.Target.Id}{edge.Weight}");
                 str = str.Remove(0, 1);
-                _vertexString = str.ToString();
+                _edgesString = str.ToString();
             }
-            return _vertexString;
+            return _edgesString;
         }
     }
 }

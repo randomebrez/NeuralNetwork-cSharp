@@ -1,6 +1,6 @@
 ﻿namespace NeuralNetwork.Interfaces.Model
 {
-    public class Vertex
+    public class Edge
     {
         public string Identifier { get; set; }
 

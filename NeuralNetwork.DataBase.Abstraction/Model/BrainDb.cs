@@ -9,10 +9,16 @@ namespace NeuralNetwork.DataBase.Abstraction.Model
         [Column("brain_id"), Key, Required]
         public int Id { get; set; }
 
-        [Column("unit_id"), Required]
-        public int UnitId { get; set; }
+        [Column("simulation_id"), Required]
+        public int SimulationId { get; set; }
 
-        [ForeignKey(nameof(UnitId))]
-        public UnitDb Unit { get; set; }
+        [Column("brain_unique_id"), Required]
+        public string UniqueId { get; set; }
+
+        [Column("genome"), Required]
+        public string Genome { get; set; }
+
+        [Column("score")]
+        public float Score { get; set; }
     }
 }

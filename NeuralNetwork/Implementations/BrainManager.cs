@@ -55,7 +55,7 @@ namespace NeuralNetwork.Managers
 
         private void ComputeLayer(int layerId)
         {
-            var vertices = _brain.Vertices.Where(t => t.Target.Layer == layerId).ToList();
+            var vertices = _brain.Edges.Where(t => t.Target.Layer == layerId).ToList();
             var groupedByTarget = vertices.GroupBy(t => t.Target.UniqueId);
 
             foreach (var vertexBatch in groupedByTarget)

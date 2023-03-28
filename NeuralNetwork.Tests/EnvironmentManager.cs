@@ -32,7 +32,6 @@ namespace NeuralNetwork.Tests
         {
             var logs = new StringBuilder();
             var simulationId = await _sqlGateway.AddNewSimulationAsync();
-            await _sqlGateway.CreateVerticesAsync(_populationManager.GeneCodes);
 
             // Initialyze the life space
             StaticSpaceDimension.SpaceDimensions = new Dictionary<int, (int min, int max)>();
@@ -93,14 +92,10 @@ namespace NeuralNetwork.Tests
                 _units.Add(newUnit.GetUnit.Identifier, newUnit);
             }
             var dbUnits = _units.Values.Select(t => t.GetUnit).ToList();
-            var start = DateTime.UtcNow;
-            await _sqlGateway.StoreUnitsAsync(dbUnits).ConfigureAwait(false);
-            var end1 = DateTime.UtcNow;
-            var delta1 = end1 - start;
-            logs.AppendLine($"New units stored : {delta1.Minutes}:{delta1.Seconds}:{delta1.Milliseconds}");
 
-            await _sqlGateway.StoreUnitBrainsAsync(dbUnits).ConfigureAwait(false);
-            var delta2 = DateTime.UtcNow - end1;
+            var start = DateTime.UtcNow;
+            await _sqlGateway.StoreBrainsAsync(dbUnits.Select(t => t.Brain).ToList(), simulationId).ConfigureAwait(false);
+            var delta2 = DateTime.UtcNow - start;
             logs.AppendLine($"New brains stored : {delta2.Minutes}:{delta2.Seconds}:{delta2.Milliseconds}");
 
             return logs.ToString();
@@ -120,11 +115,6 @@ namespace NeuralNetwork.Tests
             var end1 = DateTime.UtcNow;
             var executingTime = end1 - start;
             logs.AppendLine($"Life execution time: {executingTime.Minutes}:{executingTime.Seconds}:{executingTime.Milliseconds}");
-
-            await _sqlGateway.StoreLifeStepAsync(_units.Values.Select(t => t.GetUnitWithPositions).ToList());
-            var end2 = DateTime.UtcNow;
-            var storingTime = end2 - end1;
-            logs.AppendLine($"Unit steps stored in : {storingTime.Minutes}:{storingTime.Seconds}:{storingTime.Milliseconds}");
 
             return logs.ToString();
         }

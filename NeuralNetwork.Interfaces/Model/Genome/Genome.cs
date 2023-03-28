@@ -1,4 +1,6 @@
-﻿namespace NeuralNetwork.Interfaces.Model
+﻿using System.Text;
+
+namespace NeuralNetwork.Interfaces.Model
 {
     public class Genome
     {
@@ -10,6 +12,15 @@
         {
             GeneNumber = geneNumber;
             Genes = new Gene[geneNumber];
+        }
+
+        public override string ToString()
+        {
+            var result = new StringBuilder();
+            for (int i = 0; i < GeneNumber; i++)
+                result.Append($"{Genes[i]}!");
+
+            return result.ToString();
         }
     }
 }

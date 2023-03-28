@@ -3,13 +3,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NeuralNetwork.DataBase.Abstraction.Model
 {
-    [Table("brain_vertices")]
-    public class BrainVertexDb
+    [Table("simulations")]
+    public class SimulationDb
     {
-        [Column("vertex_id"), Key, Required]
+        [Column("simulation_id"), Key, Required]
         public int Id { get; set; }
-
-        [Column("vertex_identifier"), Required]
-        public string Identifier { get; set; }
     }
 }

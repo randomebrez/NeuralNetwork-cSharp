@@ -23,22 +23,22 @@ namespace NeuralNetwork.Helpers
             return genome;
         }
 
-        public static List<Vertex> TranslateGenome(this Genome genome, BrainNeurons neurons)
+        public static List<Edge> TranslateGenome(this Genome genome, BrainNeurons neurons)
         {
-            var vertices = new List<Vertex>();
+            var vertices = new List<Edge>();
             //Read each gene
-            foreach (var geneGroup in genome.Genes.GroupBy(t => t.VertexIdentifier))
+            foreach (var geneGroup in genome.Genes.GroupBy(t => t.EdgeIdentifier))
             {
-                Vertex vertex = null;
+                Edge vertex = null;
                 foreach (var gene in geneGroup)
                 {
                     if (gene.IsActive == false)
                         continue;
 
                     if (vertex == null)
-                        vertex = gene.GetVertexEdgesFromGene(neurons);
+                        vertex = gene.GetEdgesFromGene(neurons);
                     else
-                        vertex.Weight *= ComputeVertexWeigh(gene);
+                        vertex.Weight *= ComputeEdgeWeigh(gene);
                 }
                 if (vertex != null)
                     vertices.Add(vertex);
@@ -118,20 +118,20 @@ namespace NeuralNetwork.Helpers
             }
         }
 
-        private static Vertex GetVertexEdgesFromGene(this Gene gene, BrainNeurons neurons)
+        private static Edge GetEdgesFromGene(this Gene gene, BrainNeurons neurons)
         {
-            var NeuronIdentifiers = gene.VertexIdentifier.Split('-');
+            var NeuronIdentifiers = gene.EdgeIdentifier.Split('-');
 
-            return new Vertex
+            return new Edge
             {
-                Identifier = gene.VertexIdentifier,
+                Identifier = gene.EdgeIdentifier,
                 Origin = neurons.GetNeuronByName(NeuronIdentifiers[0]),
                 Target = neurons.GetNeuronByName(NeuronIdentifiers[1]),
-                Weight = ComputeVertexWeigh(gene)
+                Weight = ComputeEdgeWeigh(gene)
             };
         }
 
-        private static float ComputeVertexWeigh(this Gene gene)
+        private static float ComputeEdgeWeigh(this Gene gene)
         {
             var weighBytes = gene.WeighBytes;
             var weighResult = 0f;

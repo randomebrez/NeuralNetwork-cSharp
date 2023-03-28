@@ -9,7 +9,6 @@ namespace NeuralNetwork.DataBase.Abstraction
         public Context(string connectionString)
         {
             _connectionString = connectionString;
-            //ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
             this.ChangeTracker.LazyLoadingEnabled = false;
         }
 
@@ -18,20 +17,8 @@ namespace NeuralNetwork.DataBase.Abstraction
             optionsBuilder.UseSqlite($"Data Source={_connectionString}");
         }
 
-        public DbSet<UnitDb> Units { get; set; }
-
         public DbSet<BrainDb> Brains { get; set; }
 
-        public DbSet<BrainVertexDb> Vertices { get; set; }
-
-        public DbSet<BrainVertexLinksDb> BrainVertexLinks { get; set; }
-
-        public DbSet<InputDb> Inputs { get; set; }
-
-        public DbSet<OutputDb> Outputs { get; set; }
-
-        public DbSet<UnitStepDb> UnitSteps { get; set; }
-
-        public DbSet<Simulation> Simulations { get; set; }
+        public DbSet<SimulationDb> Simulations { get; set; }
     }
 }
