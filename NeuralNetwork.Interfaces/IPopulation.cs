@@ -8,5 +8,7 @@ namespace NeuralNetwork.Interfaces
         Brain[] GenerateFirstGeneration(int childNumber);
 
         Brain[] GenerateNewGeneration(int childNumber, List<Brain> selectedBrains);
+
+        Brain[] GetBrainFromGenomes(List<string> genomeStrings);
     }
 }

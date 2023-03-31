@@ -23,6 +23,17 @@ namespace NeuralNetwork.Helpers
             return genome;
         }
 
+        public static Genome GetGenomeFromString(string genomeString)
+        {
+            var splittedGenes = genomeString.Split('!');
+            var geneNumber = splittedGenes.Length - 1;
+            var genome = new Genome(geneNumber);
+            for (int i = 0; i < geneNumber; i++)
+                genome.Genes[i] = ToGene(splittedGenes[i]);
+
+            return genome;
+        }
+
         public static List<Edge> TranslateGenome(this Genome genome, BrainNeurons neurons)
         {
             var vertices = new List<Edge>();
@@ -75,7 +86,7 @@ namespace NeuralNetwork.Helpers
             newGenome.Genes[geneNumber - 1] = genomeDtoB.Genes[geneNumber - 1];
 
             return newGenome.DeepCopy();
-        }
+        }        
         
 
         public static void MutateGenomeList(this List<Genome> genomes, List<string> geneCodes, float mutationRate = 0.001f, float geneChangeProbability = 0.1f)
@@ -183,6 +194,19 @@ namespace NeuralNetwork.Helpers
                     gene.IsActive = !gene.IsActive;
                     break;
             }
+        }
+
+        public static Gene ToGene(string stringGene)
+        {
+            var splittedGene = stringGene.Split("|");
+            var weighBytesNumber = splittedGene[1].Length - 1;
+            var gene = new Gene(splittedGene[0], weighBytesNumber);
+            gene.WeighSign = splittedGene[1][0] == '1';
+            for (int i = 0; i < weighBytesNumber; i++)
+                gene.WeighBytes[i] = splittedGene[1][i + 1] == '1';
+
+            gene.IsActive = true;
+            return gene;
         }
 
         #endregion

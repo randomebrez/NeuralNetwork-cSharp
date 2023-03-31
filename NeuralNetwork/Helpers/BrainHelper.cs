@@ -35,11 +35,11 @@ namespace NeuralNetwork.Helpers
             {
                 UniqueIdentifier = Guid.NewGuid(),
                 Neurons = availableNeurons,
+                Genome = genome,
                 ParentA = parentA,
                 ParentB = parentB
             };
-            newBrain.Edges = genome.TranslateGenome(newBrain.Neurons);
-            newBrain.Genome = genome;
+            newBrain.Edges = genome.TranslateGenome(availableNeurons);
             //Check BrainValid
 
             return newBrain;

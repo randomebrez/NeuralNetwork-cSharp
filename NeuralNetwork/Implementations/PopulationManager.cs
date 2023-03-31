@@ -15,7 +15,6 @@ namespace NeuralNetwork.Managers
         private BrainNeurons _deepCopiedNeurons => _baseNeurons.DeepCopy();
 
         private int _maximumTryForBrainGeneration = 10;
-        private int _childrenNumberByBrain = 3;
 
         private readonly NetworkCaracteristics _dimension;
 
@@ -43,16 +42,18 @@ namespace NeuralNetwork.Managers
             var newBrains = new Brain[childNumber];
 
             var currentBrainCount = 0;
-            while (currentBrainCount < childNumber && selectedBrains.Count > 1)
+            var fertileBrains = selectedBrains;
+            while (currentBrainCount < childNumber && fertileBrains.Count > 1)
             {
-                newBrains[currentBrainCount] = GetChild(selectedBrains);
-                selectedBrains = selectedBrains.Where(t => t.UseForChildCounter < t.MaxChildNumber).ToList();
+                newBrains[currentBrainCount] = GetChild(fertileBrains);
+                fertileBrains = fertileBrains.Where(t => t.UseForChildCounter < t.MaxChildNumber).ToList();
                 currentBrainCount++;
             }
             var bestBrains = selectedBrains.OrderByDescending(t => t.MaxChildNumber).ToList();
             var brainsToComplete = MathF.Min(childNumber - currentBrainCount, bestBrains.Count);
             for(int i = 0; i < brainsToComplete; i++)
-            {   
+            {
+                bestBrains[i].UseForChildCounter = 0;
                 newBrains[currentBrainCount] = bestBrains[i];
                 currentBrainCount++;
             }    
@@ -61,7 +62,18 @@ namespace NeuralNetwork.Managers
             return newBrains;
         }
 
+        public Brain[] GetBrainFromGenomes(List<string> genomeStrings)
+        {
+            var result = new Brain[genomeStrings.Count];
 
+            for (int i = 0; i < genomeStrings.Count; i++)
+            {
+                var genome = GenomeHelper.GetGenomeFromString(genomeStrings[i]);
+                result[i] = genome.GenerateBrainFromGenome(_deepCopiedNeurons, Guid.Empty, Guid.Empty);
+            }
+
+            return result;
+        }
 
         private Brain GetChild(List<Brain> selectedBrains)
         {
