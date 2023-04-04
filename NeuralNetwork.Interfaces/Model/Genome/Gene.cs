@@ -37,7 +37,7 @@ namespace NeuralNetwork.Interfaces.Model
                 result.Append($"{toInt}");
             }
 
-            result.Append($"|{Bias}");
+            //result.Append($"|{Bias}");
 
             return result.ToString();
         }

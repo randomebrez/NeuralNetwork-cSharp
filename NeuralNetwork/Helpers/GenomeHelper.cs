@@ -51,7 +51,7 @@ namespace NeuralNetwork.Helpers
                     else
                         vertex.Weight *= ComputeEdgeWeigh(gene);
                 }
-                if (vertex != null)
+                if (vertex != null && vertex.Weight != 0)
                     vertices.Add(vertex);
             }
 
@@ -88,44 +88,15 @@ namespace NeuralNetwork.Helpers
             return newGenome.DeepCopy();
         }        
         
-
-        public static void MutateGenomeList(this List<Genome> genomes, List<string> geneCodes, float mutationRate = 0.001f, float geneChangeProbability = 0.1f)
-        {
-            foreach (var genome in genomes)
-            {
-                var mutationOccur = StaticHelper.GetUniformProbability() < mutationRate;
-                if (mutationOccur == false)
-                    continue;
-
-                if (StaticHelper.GetUniformProbability() < geneChangeProbability)
-                {
-                    var geneCodeRandomIndex = StaticHelper.GetRandomValue(0, geneCodes.Count - 1);
-                    var gene = new Gene(geneCodes[geneCodeRandomIndex], 4);
-                    gene.RandomizeBytes();
-                    genome.Genes[StaticHelper.GetRandomValue(0, genome.GeneNumber - 1)] = gene;
-                }
-                else
-                    genome.Genes[StaticHelper.GetRandomValue(0, genome.GeneNumber - 1)].Mutate();
-            }
-        }
-
-        public static void MutateGenome(this Genome genome, List<string> geneCodes, float mutationRate = 0.001f, float geneChangeProbability = 0.1f)
+        public static void MutateGenome(this Genome genome, List<string> geneCodes, float mutationRate = 0.01f)
         {
             foreach (var gene in genome.Genes)
             {
-                var mutationOccur = StaticHelper.GetUniformProbability((int)(100 / mutationRate)) < mutationRate;
+                var mutationOccur = StaticHelper.GetUniformProbability((int)(10 / mutationRate)) < mutationRate;
                 if (mutationOccur == false)
-                    continue;
+                    return;
 
-                if (StaticHelper.GetUniformProbability((int)(100 / mutationRate)) < geneChangeProbability)
-                {
-                    var geneCodeRandomIndex = StaticHelper.GetRandomValue(0, geneCodes.Count - 1);
-                    var newGene = new Gene(geneCodes[geneCodeRandomIndex], 4);
-                    newGene.RandomizeBytes();
-                    genome.Genes[StaticHelper.GetRandomValue(0, genome.GeneNumber - 1)] = newGene;
-                }
-                else
-                    gene.Mutate();
+                gene.Mutate(geneCodes);
             }
         }
 
@@ -170,7 +141,7 @@ namespace NeuralNetwork.Helpers
             gene.Bias = StaticHelper.GetUniformProbability();
         }
 
-        private static void Mutate(this Gene gene, bool allowMutateActiveByte = false)
+        private static void Mutate(this Gene gene, List<string> geneCodes, bool allowMutateActiveByte = false)
         {
             var maxValue = allowMutateActiveByte ? 3 : 2;
 
@@ -188,7 +159,11 @@ namespace NeuralNetwork.Helpers
                     break;
                 // Byte that encode Bias
                 case 2:
-                    gene.Bias = StaticHelper.GetUniformProbability();
+                    var geneCodeRandomIndex = StaticHelper.GetRandomValue(0, geneCodes.Count - 1);
+                    while (geneCodes[geneCodeRandomIndex] == gene.EdgeIdentifier)
+                        geneCodeRandomIndex = StaticHelper.GetRandomValue(0, geneCodes.Count - 1);
+                    gene.EdgeIdentifier = geneCodes[geneCodeRandomIndex];
+                    //gene.Bias = StaticHelper.GetUniformProbability();
                     break;
                 case 3:
                     gene.IsActive = !gene.IsActive;
