@@ -93,10 +93,8 @@ namespace NeuralNetwork.Helpers
             foreach (var gene in genome.Genes)
             {
                 var mutationOccur = StaticHelper.GetUniformProbability((int)(10 / mutationRate)) < mutationRate;
-                if (mutationOccur == false)
-                    return;
-
-                gene.Mutate(geneCodes);
+                if (mutationOccur)
+                    gene.Mutate(geneCodes);
             }
         }
 
