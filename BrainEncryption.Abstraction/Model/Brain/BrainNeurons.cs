@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace NeuralNetwork.Interfaces.Model
+﻿namespace BrainEncryption.Abstraction.Model
 {
     public class BrainNeurons
     {
@@ -10,7 +7,7 @@ namespace NeuralNetwork.Interfaces.Model
             Inputs = new List<NeuronInput>();
             Neutrals = new List<NeuronNeutral>();
             Outputs = new List<NeuronOutput>();
-            SinkNeuron = new NeuronOutput(-1, layerNumber)
+            SinkNeuron = new NeuronOutput(-1, layerNumber, 1)
             {
                 Value = 1
             };
@@ -37,6 +34,16 @@ namespace NeuralNetwork.Interfaces.Model
                     return Outputs.FirstOrDefault(t => t.UniqueId == name);
             }
             return null;
+        }
+
+        public void AddNeuron(Neuron neuron)
+        {
+            if (neuron is NeuronInput)
+                Inputs.Add(neuron as NeuronInput);
+            else if (neuron is NeuronNeutral)
+                Neutrals.Add(neuron as NeuronNeutral);
+            else
+                Outputs.Add(neuron as NeuronOutput);
         }
     }
 }

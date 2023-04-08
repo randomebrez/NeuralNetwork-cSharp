@@ -1,4 +1,5 @@
 ﻿using NeuralNetwork.Helpers;
+using NeuralNetwork.Interfaces;
 using NeuralNetwork.Interfaces.Model;
 using NeuralNetwork.Managers;
 using System;
@@ -8,7 +9,7 @@ using System.Text;
 
 namespace NeuralNetwork.Implementations
 {
-    public class UnitManager
+    public class UnitManager : IUnitBrains
     {
         private readonly BrainManager _brainManager;
         private readonly Dictionary<int, int> _selectedOuput = new Dictionary<int, int>();
@@ -125,6 +126,21 @@ namespace NeuralNetwork.Implementations
                     break;
             }
 
+        }
+
+        public (int ouputId, float neuronIntensity) ComputeOutput(List<float> inputs)
+        {
+            return _brainManager.ComputeOutput(inputs);
+        }
+
+        public Brain GetBrain()
+        {
+            return _brainManager.GetBrain();
+        }
+
+        public Dictionary<int, float> ComputeOuputs(List<float> inputs)
+        {
+            return _brainManager.ComputeOuputs(inputs);
         }
     }
 }

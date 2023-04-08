@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace NeuralNetwork.Managers
 {
-    public class BrainManager : IBrain
+    public class BrainManager : IUnitBrains
     {
         private readonly Brain _brain;
         private readonly int _outputLayerId;

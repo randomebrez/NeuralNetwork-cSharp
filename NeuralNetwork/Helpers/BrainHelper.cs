@@ -7,7 +7,7 @@ namespace NeuralNetwork.Helpers
 {
     public static class BrainHelper
     {
-        public static Brain? GenerateRandomBrain(NetworkCaracteristics dimension, BrainNeurons availableNeurons, List<string> geneCodes)
+        public static Brain? GenerateRandomBrain(BrainCaracteristics dimension, BrainNeurons availableNeurons, List<string> geneCodes)
         {
             var newBrain = new Brain
             {
@@ -61,21 +61,23 @@ namespace NeuralNetwork.Helpers
             //return brain.Vertices.Where(t => t.Origin.Layer == 0).Any(t => neutralToReach.Contains(t.Target.UniqueId));
         }
 
-        public static BrainNeurons GetBaseNeurons(NetworkCaracteristics dimension)
+        public static BrainNeurons GetBaseNeurons(BrainCaracteristics dimension)
         {
-            var result = new BrainNeurons();
+            var result = new BrainNeurons(1 + dimension.NeutralNumbers.Count());
 
             for (int i = 0; i < dimension.InputNumber; i++)
                 result.Inputs.Add(new NeuronInput(i, 0));
 
+            var neuronMaxValue = dimension.InputNumber;
             for (int j = 0; j < dimension.NeutralNumbers.Count(); j++)
             {
                 for (int i = 0; i < dimension.NeutralNumbers[j]; i++)
-                    result.Neutrals.Add(new NeuronNeutral(i, j+1));
+                    result.Neutrals.Add(new NeuronNeutral(i, j + 1) { MaxValue = neuronMaxValue });
+                neuronMaxValue += dimension.NeutralNumbers[j];
             }
 
             for (int k = 0; k < dimension.OutputNumber; k++)
-                result.Outputs.Add(new NeuronOutput(k, 1 + dimension.NeutralNumbers.Count()));
+                result.Outputs.Add(new NeuronOutput(k, 1 + dimension.NeutralNumbers.Count()) { MaxValue = neuronMaxValue });
 
             return result;
         }

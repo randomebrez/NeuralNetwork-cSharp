@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace NeuralNetwork.Interfaces
 {
-    public interface IBrain
+    public interface IUnitBrains
     {
         public (int ouputId, float neuronIntensity) ComputeOutput(List<float> inputs);
 

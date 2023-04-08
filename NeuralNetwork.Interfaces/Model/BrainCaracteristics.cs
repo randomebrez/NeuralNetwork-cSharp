@@ -2,12 +2,15 @@
 
 namespace NeuralNetwork.Interfaces.Model
 {
-    public class NetworkCaracteristics
+    public class BrainCaracteristics
     {
-        public NetworkCaracteristics()
+        public BrainCaracteristics(string name)
         {
-            NeutralNumbers= new List<int>();
+            NeutralNumbers = new List<int>();
+            Name = name;
         }
+
+        public string Name { get; set; }
 
         public int InputNumber { get; set; }
 
@@ -18,7 +21,5 @@ namespace NeuralNetwork.Interfaces.Model
         public int GeneNumber { get; set; }
 
         public int WeighBytesNumber { get; set; }
-
-
     }
 }

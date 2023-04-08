@@ -8,7 +8,7 @@ using System;
 
 namespace NeuralNetwork.Managers
 {
-    public class PopulationManager : IPopulation
+    public class PopulationManager : IPopulationManager
     {
         public HashSet<string> GeneCodes { get; private set; }
         private BrainNeurons _baseNeurons;
@@ -16,9 +16,9 @@ namespace NeuralNetwork.Managers
 
         private int _maximumTryForBrainGeneration = 10;
 
-        private readonly NetworkCaracteristics _dimension;
+        private readonly BrainCaracteristics _dimension;
 
-        public PopulationManager(NetworkCaracteristics dimension)
+        public PopulationManager(BrainCaracteristics dimension)
         {
             _dimension = dimension;
             _baseNeurons = BrainHelper.GetBaseNeurons(_dimension);

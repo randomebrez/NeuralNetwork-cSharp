@@ -18,9 +18,9 @@ namespace NeuralNetwork.Tests
         private int _maxPopulationNumber;
         private Dictionary<Guid, UnitManager> _units = new Dictionary<Guid, UnitManager>();
         private List<Brain> _selectedBrains = new List<Brain>();
-        private readonly NetworkCaracteristics _networkCaracteristics;
+        private readonly BrainCaracteristics _networkCaracteristics;
 
-        public EnvironmentManager(DatabaseGateway sqlGateway, NetworkCaracteristics networkCaracteristics, int maxPopulationNumber)
+        public EnvironmentManager(DatabaseGateway sqlGateway, BrainCaracteristics networkCaracteristics, int maxPopulationNumber)
         {
             _sqlGateway = sqlGateway;
             _populationManager = new PopulationManager(networkCaracteristics);
