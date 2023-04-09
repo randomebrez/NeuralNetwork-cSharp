@@ -72,12 +72,12 @@ namespace NeuralNetwork.Helpers
             for (int j = 0; j < dimension.NeutralNumbers.Count(); j++)
             {
                 for (int i = 0; i < dimension.NeutralNumbers[j]; i++)
-                    result.Neutrals.Add(new NeuronNeutral(i, j + 1) { MaxValue = neuronMaxValue });
+                    result.Neutrals.Add(new NeuronNeutral(i, j + 1) { MaxValue = neuronMaxValue / 5f });
                 neuronMaxValue += dimension.NeutralNumbers[j];
             }
 
             for (int k = 0; k < dimension.OutputNumber; k++)
-                result.Outputs.Add(new NeuronOutput(k, 1 + dimension.NeutralNumbers.Count()) { MaxValue = neuronMaxValue });
+                result.Outputs.Add(new NeuronOutput(k, 1 + dimension.NeutralNumbers.Count()) { MaxValue = neuronMaxValue / 6f });
 
             return result;
         }
