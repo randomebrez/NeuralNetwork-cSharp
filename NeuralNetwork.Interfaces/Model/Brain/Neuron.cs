@@ -58,6 +58,10 @@ namespace NeuralNetwork.Interfaces.Model
 
         public override bool CanBeTarget { get => true; }
 
+        public float MaxValue { get; set; }
+
+        private float _curveModifier => (float)((0.5f / MaxValue) * (Math.Log(1.9) - Math.Log(0.1)));
+
         //tanh pour les neurones internes
         public override void ActivationFunction()
         {
@@ -78,11 +82,15 @@ namespace NeuralNetwork.Interfaces.Model
         public override bool CanBeTarget { get => true; }
 
         public string ActionType { get; set; }
-        
+
+        public float MaxValue { get; set; }
+
+        private float _curveModifier => (float)Math.Log(9) / MaxValue;
+
         //sigmoid for output neurons
         public override void ActivationFunction()
         {
-            var expo = Math.Exp(-Value);
+            var expo = Math.Exp(- _curveModifier * Value);
             var result = (float)(1 / (1 + expo));
             Value = result < Treshold ? 0 : result;
         }
