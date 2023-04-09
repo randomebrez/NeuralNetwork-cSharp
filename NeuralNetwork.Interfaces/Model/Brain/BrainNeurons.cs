@@ -5,15 +5,11 @@ namespace NeuralNetwork.Interfaces.Model
 {
     public class BrainNeurons
     {
-        public BrainNeurons(int layerNumber)
+        public BrainNeurons()
         {
             Inputs = new List<NeuronInput>();
             Neutrals = new List<NeuronNeutral>();
             Outputs = new List<NeuronOutput>();
-            SinkNeuron = new NeuronOutput(-1, layerNumber)
-            {
-                Value = 1
-            };
         }
 
         public List<NeuronInput> Inputs { get; set; }

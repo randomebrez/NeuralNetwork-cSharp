@@ -1,4 +1,5 @@
 ﻿using BrainEncryption.Abstraction.Model;
+using System.Collections.Generic;
 
 namespace BrainEncryption.Abstraction
 {
@@ -7,8 +8,6 @@ namespace BrainEncryption.Abstraction
         HashSet<string> GetGeneCodes(NetworkCaracteristics caracteristics);
 
         Genome GenerateGenome(GenomeCaracteristics caracteristics);
-
-        string GetStringFromGenome(Genome genome);
 
         Genome GetGenomeFromString(string genomeString);
 

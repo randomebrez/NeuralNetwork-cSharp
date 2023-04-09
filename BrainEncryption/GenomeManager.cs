@@ -1,13 +1,14 @@
 ﻿using BrainEncryption.Abstraction;
 using BrainEncryption.Abstraction.Model;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace BrainEncryption
 {
     public class GenomeManager : IGenome
     {
-        private HashSet<string> _geneCodes = new HashSet<string>();
-
         public Genome GenerateGenome(GenomeCaracteristics caracteristics)
         {
             var genome = new Genome(caracteristics.GeneNumber);
@@ -66,14 +67,6 @@ namespace BrainEncryption
             return genome;
         }
 
-        public string GetStringFromGenome(Genome genome)
-        {
-            var result = new StringBuilder();
-            for (int i = 0; i < genome.GeneNumber; i++)
-                result.Append($"{GeneToString(genome.Genes[i])}!");
-
-            return result.ToString();
-        }
 
         public Genome CrossOver(GenomeCaracteristics caracteristics, Genome genomeDtoA, Genome genomeDtoB, int crossOverNumber)
         {
@@ -112,7 +105,7 @@ namespace BrainEncryption
 
         public Brain TranslateGenome(NetworkCaracteristics networkCarac, Genome genome)
         {
-            var brain = new Brain();
+            var brain = new Brain(networkCarac.OutputLayerId);
             var edges = new List<Edge>();
             //Read each gene
             foreach (var geneGroup in genome.Genes.GroupBy(t => t.EdgeIdentifier))
@@ -211,23 +204,6 @@ namespace BrainEncryption
 
             gene.IsActive = true;
             return gene;
-        }
-
-        private string GeneToString(Gene gene)
-        {
-            var result = new StringBuilder(gene.EdgeIdentifier);
-
-            result.Append(gene.WeighSign ? "|1" : "|0");
-
-            for (int i = 0; i < gene.WeighBits.Length; i++)
-            {
-                var toInt = gene.WeighBits[i] ? 1 : 0;
-                result.Append($"{toInt}");
-            }
-
-            //result.Append($"|{Bias}");
-
-            return result.ToString();
         }
 
         private void MutateGene(Gene gene, List<string> geneCodes, bool allowMutateActiveByte = false)

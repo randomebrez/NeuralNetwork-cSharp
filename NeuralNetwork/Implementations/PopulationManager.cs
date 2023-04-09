@@ -1,158 +1,151 @@
 ﻿using NeuralNetwork.Interfaces;
 using NeuralNetwork.Interfaces.Model;
 using NeuralNetwork.Helpers;
-using NeuralNetwork.Implementations;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using BrainEncryption.Abstraction;
+using BrainEncryption;
+using BrainEncryption.Abstraction.Model;
+using NeuralNetwork.DataBase.Abstraction.Model;
 
 namespace NeuralNetwork.Managers
 {
     public class PopulationManager : IPopulationManager
     {
-        public HashSet<string> GeneCodes { get; private set; }
-        private BrainNeurons _baseNeurons;
-        private BrainNeurons _deepCopiedNeurons => _baseNeurons.DeepCopy();
 
-        private int _maximumTryForBrainGeneration = 10;
+        private IGenome _genomeEncryption;
 
-        private readonly BrainCaracteristics _dimension;
-
-        public PopulationManager(BrainCaracteristics dimension)
+        public PopulationManager()
         {
-            _dimension = dimension;
-            _baseNeurons = BrainHelper.GetBaseNeurons(_dimension);
-            GeneCodes = GetGeneCodes();
+
+            _genomeEncryption = new GenomeManager();
         }
 
-        public Brain[] GenerateFirstGeneration(int childNumber)
+        public Unit[] GenerateFirstGeneration(int childNumber, List<BrainCaracteristics> brainCaracteristics)
         {
-            var newBrains = new Brain[childNumber];
-            for (int i = 0; i < childNumber; i++)
+            return GenerateRandomUnits(childNumber, brainCaracteristics);
+        }
+
+        public Unit[] GenerateNewGeneration(int childNumber, List<Unit> selectedUnits, List<BrainCaracteristics> brainCaracteristics, int crossOverNumber, float mutationRate)
+        {
+            var newUnits = new Unit[childNumber];
+
+            var currentUnitCount = 0;
+            var fertileUnits = selectedUnits;
+            while (currentUnitCount < childNumber && fertileUnits.Count > 1)
             {
-                var newBrain = BrainHelper.GenerateRandomBrain(_dimension, _deepCopiedNeurons, GeneCodes.ToList());
-                if (newBrain != null)
-                    newBrains[i] = newBrain;
+                newUnits[currentUnitCount] = GetChild(fertileUnits, brainCaracteristics, crossOverNumber, mutationRate);
+                fertileUnits = fertileUnits.Where(t => t.UseForChildCounter < t.MaxChildNumber).ToList();
+                currentUnitCount++;
             }
-            return newBrains;
-        }
-
-        public Brain[] GenerateNewGeneration(int childNumber, List<Brain> selectedBrains)
-        {
-            var newBrains = new Brain[childNumber];
-
-            var currentBrainCount = 0;
-            var fertileBrains = selectedBrains;
-            while (currentBrainCount < childNumber && fertileBrains.Count > 1)
+            var bestUnits = selectedUnits.OrderByDescending(t => t.MaxChildNumber).ToList();
+            var unitsToComplete = MathF.Min(childNumber - currentUnitCount, bestUnits.Count);
+            for (int i = 0; i < unitsToComplete; i++)
             {
-                newBrains[currentBrainCount] = GetChild(fertileBrains);
-                fertileBrains = fertileBrains.Where(t => t.UseForChildCounter < t.MaxChildNumber).ToList();
-                currentBrainCount++;
+                bestUnits[i].UseForChildCounter = 0;
+                newUnits[currentUnitCount] = bestUnits[i];
+                currentUnitCount++;
             }
-            var bestBrains = selectedBrains.OrderByDescending(t => t.MaxChildNumber).ToList();
-            var brainsToComplete = MathF.Min(childNumber - currentBrainCount, bestBrains.Count);
-            for(int i = 0; i < brainsToComplete; i++)
+            if (childNumber - currentUnitCount > 0)
             {
-                bestBrains[i].UseForChildCounter = 0;
-                newBrains[currentBrainCount] = bestBrains[i];
-                currentBrainCount++;
-            }    
-            for (int i = currentBrainCount; i < childNumber; i++)
-                newBrains[i] = GenerateRandomBrain();
-            return newBrains;
+                var randomUnits = GenerateRandomUnits(childNumber - currentUnitCount, brainCaracteristics);
+                for (int i = currentUnitCount; i < childNumber; i++)
+                    newUnits[i] = randomUnits[i - currentUnitCount];
+            }
+            return newUnits;
         }
 
-        public Brain[] GetBrainFromGenomes(List<string> genomeStrings)
+        public Unit[] GetUnitFromGenomes(BrainCaracteristics brainCaracteristic, List<string> genomeStrings)
         {
-            var result = new Brain[genomeStrings.Count];
-
+            var units = new Unit[genomeStrings.Count];
             for (int i = 0; i < genomeStrings.Count; i++)
             {
-                var genome = GenomeHelper.GetGenomeFromString(genomeStrings[i]);
-                result[i] = genome.GenerateBrainFromGenome(_deepCopiedNeurons, Guid.Empty, Guid.Empty);
+                var unit = new Unit();
+                var genome = _genomeEncryption.GetGenomeFromString(genomeStrings[i]);
+                var brain = _genomeEncryption.TranslateGenome(brainCaracteristic.ToNetworkCaracteristic(), genome);
+
+                var pair = new BrainGenomePair
+                {
+                    Key = brainCaracteristic.Name,
+                    Brain = brain.ToPublic(),
+                    Genome = genome.ToPublic()
+                };
+                unit.Brains.Add(brainCaracteristic.Name, pair);
             }
 
+            return units;
+        }
+
+
+
+        private Unit GetChild(List<Unit> selectedUnits, List<BrainCaracteristics> brainCaracteristics, int crossOverNumber, float mutationRate)
+        {
+            var unit = new Unit();
+            var firstindex = Helpers.StaticHelper.GetRandomValue(0, selectedUnits.Count - 1);
+            var parentA = selectedUnits[firstindex];
+            var secondIndex = firstindex;
+            while (secondIndex == firstindex)
+                secondIndex = Helpers.StaticHelper.GetRandomValue(0, selectedUnits.Count - 1);
+            var parentB = selectedUnits[secondIndex];
+
+            foreach (var brainCarac in brainCaracteristics)
+            {
+                var genomeCarac = brainCarac.ToGenomeCaracteristic();
+                var mixedGenome = _genomeEncryption.CrossOver(genomeCarac, _genomeEncryption.GetGenomeFromString(parentA.Brains[brainCarac.Name].Genome.GenomeToString), _genomeEncryption.GetGenomeFromString(parentB.Brains[brainCarac.Name].Genome.GenomeToString), crossOverNumber);
+                var mutatedGenome = _genomeEncryption.MutateGenome(mixedGenome, genomeCarac, mutationRate);
+                var brain = _genomeEncryption.TranslateGenome(brainCarac.ToNetworkCaracteristic(), mutatedGenome);
+
+                var pair = new BrainGenomePair
+                {
+                    Key = brainCarac.Name,
+                    Brain = brain.ToPublic(),
+                    Genome = mutatedGenome.ToPublic()
+                };
+                unit.Brains.Add(brainCarac.Name, pair);
+                unit.ParentA = parentA.Identifier;
+                unit.ParentB = parentB.Identifier;
+            }
+
+            parentA.UseForChildCounter++;
+            parentB.UseForChildCounter++;
+            return unit;
+        }
+
+        private Unit[] GenerateRandomUnits(int childNumber, List<BrainCaracteristics> brainCaracteristics)
+        {
+            var result = new Unit[childNumber];
+            var firstLoop = true;
+            foreach (var brainCarac in brainCaracteristics)
+            {
+                brainCarac.GeneCodes = _genomeEncryption.GetGeneCodes(brainCarac.ToNetworkCaracteristic());
+                var genomeCarac = brainCarac.ToGenomeCaracteristic();
+                var networkCarac = brainCarac.ToNetworkCaracteristic();
+                for (int i = 0; i < childNumber; i++)
+                {
+                    // ToDo : Possibility to inject MaxChildNumber property
+                    if (firstLoop)
+                        result[i] = new Unit();
+
+                    var unit = result[i];
+
+                    // Generate genome
+                    var newGenome = _genomeEncryption.GenerateGenome(genomeCarac);
+                    // Translate it to a brain
+                    var newBrain = _genomeEncryption.TranslateGenome(networkCarac, newGenome);
+
+                    var pair = new BrainGenomePair
+                    {
+                        Key = brainCarac.Name,
+                        Brain = newBrain.ToPublic(),
+                        Genome = newGenome.ToPublic()
+                    };
+                    unit.Brains.Add(brainCarac.Name, pair);
+                }
+
+                firstLoop = false;
+            }
             return result;
         }
-
-        private Brain GetChild(List<Brain> selectedBrains)
-        {
-            var brain = new Brain();
-            bool exitWhile = false;
-            var tryCount = 0;
-            while(exitWhile == false && tryCount < _maximumTryForBrainGeneration)
-            {
-                var firstindex = StaticHelper.GetRandomValue(0, selectedBrains.Count - 1);
-                var brainA = selectedBrains[firstindex];
-                var secondIndex = firstindex;
-                while (secondIndex == firstindex)
-                    secondIndex = StaticHelper.GetRandomValue(0, selectedBrains.Count - 1);
-                var brainB = selectedBrains[secondIndex];
-
-                var mixedGenome = brainA.Genome.CrossOver(brainB.Genome);
-                mixedGenome.MutateGenome(GeneCodes.ToList());
-                brain = mixedGenome.GenerateBrainFromGenome(_deepCopiedNeurons, brainA.UniqueIdentifier, brainB.UniqueIdentifier);
-                exitWhile = brain.IsBrainValid();
-                if (exitWhile)
-                {
-                    brainA.UseForChildCounter++;
-                    brainB.UseForChildCounter++;
-                }
-                tryCount++;
-            }
-            return brain;
-        }
-
-        private Brain GenerateRandomBrain()
-        {
-            var validBrain = false;
-            var currentTry = 0;
-            var brain = new Brain
-            {
-                UniqueIdentifier = Guid.NewGuid(),
-            };
-            while (validBrain == false && currentTry < _maximumTryForBrainGeneration)
-            {
-                currentTry++;
-                brain = BrainHelper.GenerateRandomBrain(_dimension, _deepCopiedNeurons, GeneCodes.ToList());
-                validBrain = brain != null;
-            }
-
-            return brain;
-        }
-
-        private HashSet<string> GetGeneCodes()
-        {
-            var geneCodes = new HashSet<string>();
-            for (int input = 0; input < _dimension.InputNumber; input++)
-            {
-                for (int output = 0; output < _dimension.OutputNumber; output++)
-                    geneCodes.Add($"I:{input}-O:{output}");
-            }
-
-            for (int i = 0; i < _dimension.NeutralNumbers.Count(); i++)
-            {
-                for (int j = 0; j < _dimension.NeutralNumbers[i]; j++)
-                {
-                    // Input links
-                    for (int input = 0; input < _dimension.InputNumber; input++)
-                        geneCodes.Add($"I:{input}-N{i+1}:{j}");
-
-                    // Output links
-                    for (int output = 0; output < _dimension.OutputNumber; output++)
-                        geneCodes.Add($"N{i + 1}:{j}-O:{output}");
-
-                    // Other neutral layers links
-                    for (int neutralLayer = i+1; neutralLayer < _dimension.NeutralNumbers.Count(); neutralLayer++)
-                    {
-                        for (int neutral = 0; neutral < _dimension.NeutralNumbers[neutralLayer]; neutral++)
-                            geneCodes.Add($"N{i+1}:{j}-N{neutralLayer+1}:{neutral}");
-                    }
-                }
-            }
-
-            return geneCodes;
-        }
     }
-
 }

@@ -13,5 +13,14 @@ namespace BrainEncryption.Abstraction.Model
             GeneNumber = geneNumber;
             Genes = new Gene[geneNumber];
         }
+
+        public override string ToString()
+        {
+            var result = new StringBuilder();
+            for (int i = 0; i < GeneNumber; i++)
+                result.Append($"{Genes[i]}!");
+
+            return result.ToString();
+        }
     }
 }

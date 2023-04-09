@@ -5,7 +5,10 @@ namespace NeuralNetwork.Interfaces.Model
 {
     public class Unit
     {
-        public int Id { get; set; }
+        public Unit()
+        {
+            Identifier = Guid.NewGuid();
+        }
 
         public Guid Identifier { get; set; }
 
@@ -13,8 +16,10 @@ namespace NeuralNetwork.Interfaces.Model
 
         public Guid ParentB { get; set; }
 
-        public Dictionary<string> Brain { get; set; }
+        public Dictionary<string, BrainGenomePair> Brains { get; set; }
 
-        public Genome Genome { get; set; }
+        public int UseForChildCounter { get; set; }
+
+        public int MaxChildNumber { get; set; } = 3;
     }
 }

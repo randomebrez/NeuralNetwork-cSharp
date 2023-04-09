@@ -1,4 +1,7 @@
-﻿namespace BrainEncryption.Abstraction.Model
+﻿using System.Collections.Generic;
+using System.Linq;
+
+namespace BrainEncryption.Abstraction.Model
 {
     public class BrainNeurons
     {
@@ -7,10 +10,7 @@
             Inputs = new List<NeuronInput>();
             Neutrals = new List<NeuronNeutral>();
             Outputs = new List<NeuronOutput>();
-            SinkNeuron = new NeuronOutput(-1, layerNumber, 1)
-            {
-                Value = 1
-            };
+            SinkNeuron = new NeuronOutput(-1, layerNumber, 1);
         }
 
         public List<NeuronInput> Inputs { get; set; }

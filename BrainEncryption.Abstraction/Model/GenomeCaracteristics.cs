@@ -1,4 +1,7 @@
-﻿namespace BrainEncryption.Abstraction.Model
+﻿using System.Collections.Generic;
+using System.Linq;
+
+namespace BrainEncryption.Abstraction.Model
 {
     public class GenomeCaracteristics
     {
