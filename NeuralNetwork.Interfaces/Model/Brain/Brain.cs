@@ -12,6 +12,8 @@ namespace NeuralNetwork.Interfaces.Model
 
         public List<Edge> Edges { get; set; }
 
+        public int OutputLayerId { get; set; }
+
         private string _edgesString { get; set; }
 
         public override string ToString()

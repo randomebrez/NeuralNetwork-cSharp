@@ -1,9 +1,8 @@
 ﻿using publicDtos = NeuralNetwork.Interfaces.Model;
 using internalDtos = BrainEncryption.Abstraction.Model;
 using System.Linq;
-using System.Reflection.Emit;
 
-namespace NeuralNetwork
+namespace NeuralNetwork.Helpers
 {
     public static class Mapper
     {
@@ -16,9 +15,9 @@ namespace NeuralNetwork
         {
             return new internalDtos.NetworkCaracteristics
             {
-                InputNumber= brainCarac.InputNumber,
-                NeutralNumbers= brainCarac.NeutralNumbers,
-                OutputNumber= brainCarac.OutputNumber,
+                InputNumber = brainCarac.InputNumber,
+                NeutralNumbers = brainCarac.NeutralNumbers,
+                OutputNumber = brainCarac.OutputNumber,
                 Tanh90Percent = brainCarac.Tanh90Percent,
                 Sigmoid90Percent = brainCarac.Sigmoid90Percent
             };
@@ -53,8 +52,9 @@ namespace NeuralNetwork
             return new publicDtos.Brain
             {
                 UniqueIdentifier = brain.UniqueIdentifier,
-                Edges = brain.Edges.Select( t => t.ToPublic()).ToList(),
-                Neurons = brain.Neurons.ToPublic()
+                Edges = brain.Edges.Select(t => t.ToPublic()).ToList(),
+                Neurons = brain.Neurons.ToPublic(),
+                OutputLayerId = brain.OutputLayerId
             };
         }
 

@@ -13,14 +13,15 @@ namespace NeuralNetwork.Managers
 {
     public class PopulationManager : IPopulationManager
     {
-
         private IGenome _genomeEncryption;
+
 
         public PopulationManager()
         {
 
             _genomeEncryption = new GenomeManager();
         }
+
 
         public Unit[] GenerateFirstGeneration(int childNumber, List<BrainCaracteristics> brainCaracteristics)
         {

@@ -1,14 +1,13 @@
-﻿using NeuralNetwork.Interfaces.Model;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace NeuralNetwork.Interfaces
 {
     public interface IUnitBrains
     {
-        public (int ouputId, float neuronIntensity) ComputeOutput(List<float> inputs);
+        void ComputeBrain(string brainKey, List<float> inputs);
 
-        public Brain GetBrain();
+        (int ouputId, float neuronIntensity) GetBestOutput(string brainKey);
 
-        public Dictionary<int, float> ComputeOuputs(List<float> inputs);
+        List<float> GetOutputs(string brainKey);
     }
 }

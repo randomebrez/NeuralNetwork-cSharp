@@ -9,13 +9,6 @@ namespace NeuralNetwork.Helpers
         {
             return new BrainDb
             {
-                Genome = brain.Genome.ToString(),
-                UniqueId = brain.UniqueIdentifier.ToString(),
-                ParentA = brain.ParentA.ToString(),
-                ParentB = brain.ParentB.ToString(),
-                Score = brain.Score,
-                SimulationId = simulationId,
-                GenerationId = generationId
             };
         }
     }
