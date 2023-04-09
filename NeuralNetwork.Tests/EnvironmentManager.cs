@@ -7,6 +7,7 @@ using NeuralNetwork.Implementations;
 using NeuralNetwork.Interfaces.Model;
 using NeuralNetwork.Managers;
 using System.Linq;
+using NeuralNetwork.Tests.Model;
 
 namespace NeuralNetwork.Tests
 {
@@ -16,19 +17,23 @@ namespace NeuralNetwork.Tests
         private readonly PopulationManager _populationManager;
 
         private int _maxPopulationNumber;
-        private Dictionary<Guid, UnitManager> _units = new Dictionary<Guid, UnitManager>();
-        private List<Brain> _selectedBrains = new List<Brain>();
-        private readonly BrainCaracteristics _networkCaracteristics;
+        private Dictionary<Guid, UnitManagerTest> _units = new Dictionary<Guid, UnitManagerTest>();
+        private List<UnitTest> _selectedBrains = new List<UnitTest>();
+        private readonly List<BrainCaracteristics> _networkCaracteristics;
+        private int _crossOverNumber;
+        private float _mutationRate;
 
-        public EnvironmentManager(DatabaseGateway sqlGateway, BrainCaracteristics networkCaracteristics, int maxPopulationNumber)
+        public EnvironmentManager(DatabaseGateway sqlGateway, List<BrainCaracteristics> networkCaracteristics, int maxPopulationNumber, int crossOverNumber, float mutationRate)
         {
             _sqlGateway = sqlGateway;
-            _populationManager = new PopulationManager(networkCaracteristics);
+            _populationManager = new PopulationManager();
             _maxPopulationNumber = maxPopulationNumber;
             _networkCaracteristics = networkCaracteristics;
+            _crossOverNumber = crossOverNumber;
+            _mutationRate = mutationRate;
         }
 
-        public async Task<string> ExecuteLifeAsync(int[] spaceDimensions, int maxNumberOfGeneration, int unitLifeTime, float selectionRadius, int numberOfBestToTake)
+        public async Task<string> ExecuteLifeAsync(int[] spaceDimensions, int maxNumberOfGeneration, int unitLifeTime, float selectionRadius, int numberOfBestToTake, int meanChildNumber)
         {
             var logs = new StringBuilder();
             var simulationId = await _sqlGateway.AddNewSimulationAsync();
@@ -54,7 +59,7 @@ namespace NeuralNetwork.Tests
                 currentLog.AppendLine(await ExecuteGenerationLifeAsync().ConfigureAwait(false));
 
                 //Select The Best
-                var survivorNumber = SelectBestUnitsCircular(selectionRadius * StaticSpaceDimension.SpaceDimensions[0].max, numberOfBestToTake);
+                var survivorNumber = SelectBestUnitsCircular(selectionRadius * StaticSpaceDimension.SpaceDimensions[0].max, numberOfBestToTake, meanChildNumber);
                 //var survivorNumber = SelectBestUnitsLateral(0.1f);
 
                 var survivorPercent = 100 * ((float)survivorNumber / (float)_maxPopulationNumber);
@@ -74,32 +79,6 @@ namespace NeuralNetwork.Tests
             return logs.ToString();
         }
 
-        private async Task<string> GetNextGenerationAsync(int unitLifeTime, int generationId, int simulationId)
-        {
-            var logs = new StringBuilder();
-
-            _units.Clear();
-            Brain[] brains;
-            if (_selectedBrains.Any())
-                brains = _populationManager.GenerateNewGeneration(_maxPopulationNumber, _selectedBrains);
-            else
-                brains = _populationManager.GenerateFirstGeneration(_maxPopulationNumber);
-            for (var index = 0; index < brains.Length; index++)
-            {
-                if (brains[index] == null)
-                    continue;
-                var newUnit = new UnitManager(brains[index], GetRandomPosition(), unitLifeTime, generationId, simulationId);
-                _units.Add(newUnit.GetUnit.Identifier, newUnit);
-            }
-            var dbUnits = _units.Values.Select(t => t.GetUnit).ToList();
-
-            var start = DateTime.UtcNow;
-            await _sqlGateway.StoreBrainsAsync(simulationId, generationId, dbUnits.Select(t => t.Brain).ToList()).ConfigureAwait(false);
-            var delta2 = DateTime.UtcNow - start;
-            logs.AppendLine($"New brains stored : {delta2.Minutes}:{delta2.Seconds}:{delta2.Milliseconds}");
-
-            return logs.ToString();
-        }
 
         private async Task<string> ExecuteGenerationLifeAsync()
         {
@@ -110,7 +89,7 @@ namespace NeuralNetwork.Tests
             for (int i = 0; i < loopCounter; i++)
             {
                 foreach (var unit in _units.Values)
-                    unit.ExecuteAction(i + 1);
+                    unit.ExecuteAction();
             }
             var end1 = DateTime.UtcNow;
             var executingTime = end1 - start;
@@ -119,7 +98,63 @@ namespace NeuralNetwork.Tests
             return logs.ToString();
         }
 
-        private int SelectBestUnitsCircular(float radius, int? maxNumberToTake)
+        private async Task<string> GetNextGenerationAsync(int unitLifeTime, int generationId, int simulationId)
+        {
+            var logs = new StringBuilder();
+
+            _units.Clear();
+            Unit[] brains;
+            if (_selectedBrains.Any())
+                brains = _populationManager.GenerateNewGeneration(_maxPopulationNumber, _selectedBrains.Select(t => t.Unit).ToList(), _networkCaracteristics, _crossOverNumber, _mutationRate);
+            else
+                brains = _populationManager.GenerateFirstGeneration(_maxPopulationNumber, _networkCaracteristics);
+            for (var index = 0; index < brains.Length; index++)
+            {
+                if (brains[index] == null)
+                    continue;
+                var newUnit = new UnitManagerTest(brains[index], GetRandomPosition(), unitLifeTime, generationId, simulationId);
+                _units.Add(brains[index].Identifier, newUnit);
+            }
+            var dbUnits = _units.Values.Select(t => t.GetUnit).ToList();
+
+            var start = DateTime.UtcNow;
+            await _sqlGateway.StoreBrainsAsync(simulationId, generationId, dbUnits.Select(t => t.Unit.Brains.First().Value.Brain).ToList()).ConfigureAwait(false);
+            var delta2 = DateTime.UtcNow - start;
+            logs.AppendLine($"New brains stored : {delta2.Minutes}:{delta2.Seconds}:{delta2.Milliseconds}");
+
+            return logs.ToString();
+        }
+
+
+        private int SelectBestUnitsLateral(float xPercent, int meanChildNumber)
+        {
+            _selectedBrains.Clear();
+            var minCoordinateToReach = StaticSpaceDimension.SpaceDimensions[0].min + (1 + xPercent) * (StaticSpaceDimension.SpaceDimensions[0].max - StaticSpaceDimension.SpaceDimensions[0].min) / 2;
+            var survivorNumber = 0;
+            foreach (var unit in _units.Values)
+            {
+                if (unit.GetUnit.Position.GetCoordinate(0) >= minCoordinateToReach)
+                {
+                    _selectedBrains.Add(unit.GetUnit);
+                    survivorNumber++;
+                }
+            }
+
+            var index1 = _selectedBrains.Count / 3;
+            for (int i = 0; i < _selectedBrains.Count; i++)
+            {
+                if (i < index1)
+                    _selectedBrains[i].Unit.MaxChildNumber = meanChildNumber + meanChildNumber / 2;
+                else if (i < _selectedBrains.Count - index1)
+                    _selectedBrains[i].Unit.MaxChildNumber = meanChildNumber;
+                else
+                    _selectedBrains[i].Unit.MaxChildNumber = meanChildNumber - meanChildNumber / 2;
+            }
+
+            return survivorNumber;
+        }
+
+        private int SelectBestUnitsCircular(float radius, int meanChildNumber, int? maxNumberToTake)
         {
             _selectedBrains.Clear();
             var radiusToReach = 8000;
@@ -130,17 +165,29 @@ namespace NeuralNetwork.Tests
                 var squareSum = 0f;
                 for (int j = 0; j < StaticSpaceDimension.DimensionNumber; j++)
                     squareSum += (float)Math.Pow(unit.GetUnit.Position.GetCoordinate(j), 2);
-                unitCenterDistances.Add(unit.GetUnit.Identifier, squareSum);
+                unitCenterDistances.Add(unit.GetUnit.Unit.Identifier, squareSum);
             }
             var selectedUnits = unitCenterDistances.OrderBy(t => t.Value).Where(t => t.Value < radiusToReach);
             var survivorNumber = unitCenterDistances.Where(t => t.Value < radiusforSurvivor).Count();
             foreach (var unitPair in selectedUnits.Take(maxNumberToTake ?? survivorNumber))
-                _selectedBrains.Add(_units[unitPair.Key].GetUnit.Brain);
+                _selectedBrains.Add(_units[unitPair.Key].GetUnit);
+
+            var index1 = _selectedBrains.Count / 3;
+            for (int i = 0; i < _selectedBrains.Count; i++)
+            {
+                if (i < index1)
+                    _selectedBrains[i].Unit.MaxChildNumber = meanChildNumber + meanChildNumber / 2;
+                else if (i < _selectedBrains.Count - index1)
+                    _selectedBrains[i].Unit.MaxChildNumber = meanChildNumber;
+                else
+                    _selectedBrains[i].Unit.MaxChildNumber = meanChildNumber - meanChildNumber / 2;
+            }
 
             if (selectedUnits.Any())
                 Console.WriteLine($"High score = {selectedUnits.First().Value}");
             return survivorNumber;
         }
+
 
         private float[] GetRandomPosition()
         {
@@ -149,8 +196,6 @@ namespace NeuralNetwork.Tests
                 result[i] = StaticHelper.GetRandomValue(StaticSpaceDimension.SpaceDimensions[i].min, StaticSpaceDimension.SpaceDimensions[i].max);
             return result;
         }
-
-
 
         private string SavePosition()
         {
@@ -161,23 +206,6 @@ namespace NeuralNetwork.Tests
             }
 
             return logs.ToString();
-        }
-
-        private int SelectBestUnitsLateral(float xPercent)
-        {
-            _selectedBrains.Clear();
-            var minCoordinateToReach = StaticSpaceDimension.SpaceDimensions[0].min + (1 + xPercent) * (StaticSpaceDimension.SpaceDimensions[0].max - StaticSpaceDimension.SpaceDimensions[0].min) / 2;
-            var survivorNumber = 0;
-            foreach (var unit in _units.Values)
-            {
-                if (unit.GetUnit.Position.GetCoordinate(0) >= minCoordinateToReach)
-                {
-                    _selectedBrains.Add(unit.GetUnit.Brain);
-                    survivorNumber++;
-                }
-            }
-
-            return survivorNumber;
         }
     }
 }

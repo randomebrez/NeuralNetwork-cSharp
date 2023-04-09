@@ -2,78 +2,56 @@
 using NeuralNetwork.Interfaces;
 using NeuralNetwork.Interfaces.Model;
 using NeuralNetwork.Managers;
+using NeuralNetwork.Tests.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace NeuralNetwork.Implementations
+namespace NeuralNetwork.Tests
 {
-    public class UnitManagerTest : IUnitBrains
+    public class UnitManagerTest
     {
-        //private readonly BrainManager _brainManager;
+        private readonly IUnitBrains _unitManager;
         private readonly Dictionary<int, int> _selectedOuput = new Dictionary<int, int>();
-        private readonly Unit _unit;
+        private readonly UnitTest _unit;
         private string[] _positions;
 
-        public UnitManagerTest(Brain brain, float[] startingPosition, int lifeTime, int generationId, int simulationId)
+        public UnitManagerTest(Unit unit, float[] startingPosition, int lifeTime, int generationId, int simulationId)
         {
-            _unit = new Unit
+            _unit = new UnitTest
             {
-                Identifier = Guid.NewGuid(),
-                Position = new SpacePosition(startingPosition),
+                Unit= unit,
                 LifeTime = lifeTime,
-                Fertile = true,
-                Brain = brain,
-                Age = 1,
                 GenerationId = generationId,
-                SimulationId = simulationId
+                SimulationId = simulationId,
+                Position = new SpacePosition(startingPosition)
             };
             _positions = new string[lifeTime + 1];
             _positions[0] = _unit.Position.ToString();
-            _brainManager = new BrainManager(brain);
+            _unitManager = new UnitManager(unit);
         }
 
-        public Unit GetUnit => _unit;
+        public UnitTest GetUnit => _unit;
 
-        public (Unit unit, string[] positions) GetUnitWithPositions => (_unit, _positions);
-
-        public void ExecuteAction(int actionNumber)
-        {
-            var inputs = GetDistanceToWalls();
-            var result = _brainManager.ComputeOutput(inputs.ToList());
-            ExecuteOutput(result.ouputId);
-            _positions[actionNumber] = _unit.Position.ToString();
-            _unit.Age++;
-        }
+        public (UnitTest unit, string[] positions) GetUnitWithPositions => (_unit, _positions);
 
         public Dictionary<int, int> GetLifeTimeOutputs => _selectedOuput;
 
-        private void StoreOutput(int outputId)
+
+        public void ExecuteAction()
         {
-            if (_selectedOuput.ContainsKey(outputId))
-                _selectedOuput[outputId]++;
-            else
-                _selectedOuput.Add(outputId, 1);
+            var inputs = GetInputs();
+            _unitManager.ComputeBrain("Main", inputs.ToList());
+
+            var result = _unitManager.GetBestOutput("Main");
+            ExecuteOutput(result.ouputId);
+
+            _unit.Age++;
+            _positions[_unit.Age] = _unit.Position.ToString();
         }
 
-        private void Move(int dimensionIndex, float value)
-        {
-            if (dimensionIndex >= StaticSpaceDimension.DimensionNumber)
-                throw new Exception(
-                    $"Cannot move to that direction. Max dimension {StaticSpaceDimension.DimensionNumber}. Requested: {dimensionIndex}");
-            var isMoveLegit = IsMoveLegit(dimensionIndex, value);
-            if (isMoveLegit.legit)
-                _unit.Position.SetCoordinate(dimensionIndex, isMoveLegit.finalPosition);
-        }
-
-        private (bool legit, float finalPosition) IsMoveLegit(int dimensionIndex, float value)
-        {
-            var result = _unit.Position.GetCoordinate(dimensionIndex) + value;
-            return (result <= StaticSpaceDimension.SpaceDimensions[dimensionIndex].max && result >= StaticSpaceDimension.SpaceDimensions[dimensionIndex].min, result);
-        }
-
-        private float[] GetDistanceToWalls()
+        private float[] GetInputs()
         {
             var distances = new float[2 * StaticSpaceDimension.DimensionNumber];
             for (int i = 0; i < StaticSpaceDimension.DimensionNumber; i++)
@@ -128,19 +106,28 @@ namespace NeuralNetwork.Implementations
 
         }
 
-        public (int ouputId, float neuronIntensity) ComputeOutput(List<float> inputs)
+        private void Move(int dimensionIndex, float value)
         {
-            return _brainManager.ComputeOutput(inputs);
+            if (dimensionIndex >= StaticSpaceDimension.DimensionNumber)
+                throw new Exception(
+                    $"Cannot move to that direction. Max dimension {StaticSpaceDimension.DimensionNumber}. Requested: {dimensionIndex}");
+            var isMoveLegit = IsMoveLegit(dimensionIndex, value);
+            if (isMoveLegit.legit)
+                _unit.Position.SetCoordinate(dimensionIndex, isMoveLegit.finalPosition);
         }
 
-        public Brain GetBrain()
+        private (bool legit, float finalPosition) IsMoveLegit(int dimensionIndex, float value)
         {
-            return _brainManager.GetBrain();
+            var result = _unit.Position.GetCoordinate(dimensionIndex) + value;
+            return (result <= StaticSpaceDimension.SpaceDimensions[dimensionIndex].max && result >= StaticSpaceDimension.SpaceDimensions[dimensionIndex].min, result);
         }
 
-        public Dictionary<int, float> ComputeOuputs(List<float> inputs)
+        private void StoreOutput(int outputId)
         {
-            return _brainManager.ComputeOuputs(inputs);
+            if (_selectedOuput.ContainsKey(outputId))
+                _selectedOuput[outputId]++;
+            else
+                _selectedOuput.Add(outputId, 1);
         }
     }
 }
