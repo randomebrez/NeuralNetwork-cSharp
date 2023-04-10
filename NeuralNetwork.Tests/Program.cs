@@ -30,9 +30,9 @@ internal class program
 
         var selectionRadius = 0.3f;
         var maxNumberToSelect = 30;
-        var meanChildNumber = 7;
-        var crossOverNumber = 1;
-        var mutationRate = 0.01f;
+        var meanChildNumber = 5;
+        var crossOverNumber = 2;
+        var mutationRate = 0.001f;
 
         var networkCaracteristics = new List<BrainCaracteristics>
         {
@@ -41,13 +41,15 @@ internal class program
                 GeneNumber = 70,
                 InputNumber = 4,
                 OutputNumber = 8,
-                NeutralNumbers = new List<int> { 4 },
-                WeighBytesNumber = 2
+                NeutralNumbers = new List<int> { 5 },
+                WeighBytesNumber = 3,
+                Tanh90Percent = 3,
+                Sigmoid90Percent = 3
             }
         };
-        
+
         // PROGRAM
-        
+
         // File is automatically recreated when instantiating the 'context'
         if (cleanDatabase && File.Exists(sqliteConnectionString))
             File.Delete(sqliteConnectionString);

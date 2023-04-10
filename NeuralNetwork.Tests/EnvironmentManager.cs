@@ -59,8 +59,12 @@ namespace NeuralNetwork.Tests
                 currentLog.AppendLine(await ExecuteGenerationLifeAsync().ConfigureAwait(false));
 
                 //Select The Best
-                var survivorNumber = SelectBestUnitsCircular(selectionRadius * StaticSpaceDimension.SpaceDimensions[0].max, numberOfBestToTake, meanChildNumber);
+                var survivorNumber = SelectBestUnitsCircular(selectionRadius * StaticSpaceDimension.SpaceDimensions[0].max, meanChildNumber, numberOfBestToTake);
                 //var survivorNumber = SelectBestUnitsLateral(0.1f);
+
+
+                // ToDo : Store best in db
+
 
                 var survivorPercent = 100 * ((float)survivorNumber / (float)_maxPopulationNumber);
                 if (survivorPercent > 98)
@@ -100,6 +104,7 @@ namespace NeuralNetwork.Tests
 
         private async Task<string> GetNextGenerationAsync(int unitLifeTime, int generationId, int simulationId)
         {
+            var start = DateTime.UtcNow;
             var logs = new StringBuilder();
 
             _units.Clear();
@@ -115,12 +120,15 @@ namespace NeuralNetwork.Tests
                 var newUnit = new UnitManagerTest(brains[index], GetRandomPosition(), unitLifeTime, generationId, simulationId);
                 _units.Add(brains[index].Identifier, newUnit);
             }
-            var dbUnits = _units.Values.Select(t => t.GetUnit).ToList();
+            var delta = DateTime.UtcNow - start;
+            logs.AppendLine($"New generation generated : {delta.Minutes}:{delta.Seconds}:{delta.Milliseconds}");
 
-            var start = DateTime.UtcNow;
-            await _sqlGateway.StoreBrainsAsync(simulationId, generationId, dbUnits.Select(t => t.Unit.Brains.First().Value.Brain).ToList()).ConfigureAwait(false);
-            var delta2 = DateTime.UtcNow - start;
-            logs.AppendLine($"New brains stored : {delta2.Minutes}:{delta2.Seconds}:{delta2.Milliseconds}");
+            //var dbUnits = _units.Values.Select(t => t.GetUnit).ToList();
+            //
+            //var start = DateTime.UtcNow;
+            //await _sqlGateway.StoreBrainsAsync(simulationId, generationId, dbUnits.Select(t => t.Unit.Brains.First().Value.Brain).ToList()).ConfigureAwait(false);
+            //var delta2 = DateTime.UtcNow - start;
+            //logs.AppendLine($"New brains stored : {delta2.Minutes}:{delta2.Seconds}:{delta2.Milliseconds}");
 
             return logs.ToString();
         }
@@ -157,7 +165,6 @@ namespace NeuralNetwork.Tests
         private int SelectBestUnitsCircular(float radius, int meanChildNumber, int? maxNumberToTake)
         {
             _selectedBrains.Clear();
-            var radiusToReach = 8000;
             var radiusforSurvivor = radius * radius;
             var unitCenterDistances = new Dictionary<Guid, float>();
             foreach (var unit in _units.Values)
@@ -167,7 +174,7 @@ namespace NeuralNetwork.Tests
                     squareSum += (float)Math.Pow(unit.GetUnit.Position.GetCoordinate(j), 2);
                 unitCenterDistances.Add(unit.GetUnit.Unit.Identifier, squareSum);
             }
-            var selectedUnits = unitCenterDistances.OrderBy(t => t.Value).Where(t => t.Value < radiusToReach);
+            var selectedUnits = unitCenterDistances.OrderBy(t => t.Value);
             var survivorNumber = unitCenterDistances.Where(t => t.Value < radiusforSurvivor).Count();
             foreach (var unitPair in selectedUnits.Take(maxNumberToTake ?? survivorNumber))
                 _selectedBrains.Add(_units[unitPair.Key].GetUnit);
