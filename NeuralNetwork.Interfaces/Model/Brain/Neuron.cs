@@ -36,7 +36,7 @@ namespace NeuralNetwork.Interfaces.Model
         public override void ActivationFunction()
         {
             // tanh for neutral neurons
-            var expo = Math.Exp(Value * CurveModifier);
+            var expo = Math.Exp(- 2 * Value * CurveModifier);
             var result = (float)((1 - expo) / (1 + expo));
             Value = result;
         }
@@ -49,7 +49,7 @@ namespace NeuralNetwork.Interfaces.Model
         public override void ActivationFunction()
         {
             //sigmoid for output neurons
-            var expo = Math.Exp(-Value * CurveModifier);
+            var expo = Math.Exp(- Value * CurveModifier);
             var result = (float)(1 / (1 + expo));
             Value = result < Treshold ? 0 : result;
         }

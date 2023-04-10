@@ -74,11 +74,12 @@ namespace BrainEncryption
             var crossOver = false;
 
             // Binomial law with average of first success around (GenomeLength/crossOverNumber) : Loi de poisson
-            var crossOverTreshold = (float)crossOverNumber / caracteristics.GeneNumber;
+            var crossOverTreshold = (float)(crossOverNumber + 1)/ caracteristics.GeneNumber;
 
             for (int i = 0; i < caracteristics.GeneNumber; i++)
             {
-                crossOver = StaticHelper.GetUniformProbability(100 * caracteristics.GeneNumber) < crossOverTreshold;
+                if (StaticHelper.GetUniformProbability(100 * caracteristics.GeneNumber) < crossOverTreshold)
+                    crossOver = !crossOver;
 
                 if (crossOver)
                     newGenome.Genes[i] = genomeDtoB.Genes[i];
@@ -176,7 +177,8 @@ namespace BrainEncryption
                 case 'I':
                     return new NeuronInput(int.Parse(neuronId), 0);
                 case 'N':
-                    var layerId = int.Parse(splitGene[0].Split('N')[0]);
+                    var stringLayer = splitGene[0].Split('N').Last();
+                    var layerId = int.Parse(stringLayer);
                     return new NeuronNeutral(int.Parse(neuronId), layerId, networkCarac.Tanh90Percent);
                 case 'O':
                     return new NeuronOutput(int.Parse(neuronId), networkCarac.OutputLayerId, networkCarac.Sigmoid90Percent);

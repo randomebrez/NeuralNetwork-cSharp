@@ -8,6 +8,7 @@ namespace NeuralNetwork.Interfaces.Model
         public Unit()
         {
             Identifier = Guid.NewGuid();
+            Brains = new Dictionary<string, BrainGenomePair>();
         }
 
         public Guid Identifier { get; set; }

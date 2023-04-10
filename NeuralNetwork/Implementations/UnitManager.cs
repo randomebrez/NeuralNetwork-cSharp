@@ -56,10 +56,13 @@ namespace NeuralNetwork.Managers
 
             foreach (var vertexBatch in groupedByTarget)
             {
-                var targetNeuron = vertexBatch.First().Target;
+                var targetNeuron = brain.Neurons.GetNeuronByName(vertexBatch.First().Target.UniqueId);
                 var computedValue = 0f;
                 foreach (var vertex in vertexBatch)
-                    computedValue += vertex.Origin.Value * vertex.Weight;
+                {
+                    var origin = brain.Neurons.GetNeuronByName(vertex.Origin.UniqueId);
+                    computedValue += origin.Value * vertex.Weight;
+                }
                 targetNeuron.Value = computedValue / vertexBatch.Count();
                 targetNeuron.ActivationFunction();
             }
