@@ -41,11 +41,11 @@ namespace BrainEncryption
                 {
                     // Input links
                     for (int input = 0; input < caracteristics.InputLayer.NeuronNumber; input++)
-                        geneCodes.Add($"I:{input}-N{currentNeutralLayer}:{j}");
+                        geneCodes.Add($"I:{input}-N{currentNeutralLayer.LayerId}:{j}");
 
                     // Output links
                     for (int output = 0; output < caracteristics.Outputlayer.NeuronNumber; output++)
-                        geneCodes.Add($"N{currentNeutralLayer}:{j}-O:{output}");
+                        geneCodes.Add($"N{currentNeutralLayer.LayerId}:{j}-O:{output}");
 
                     // Other neutral layers links (Neutral layerIds start from 1)
                     for (int neutralLayer = currentNeutralLayer.LayerId; neutralLayer < caracteristics.NeutralLayers.Count(); neutralLayer++)
