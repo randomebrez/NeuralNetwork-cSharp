@@ -34,17 +34,23 @@ internal class program
         var crossOverNumber = 2;
         var mutationRate = 0.001f;
 
+        var inputLayer = new LayerCaracteristics(LayerTypeEnum.Input, 0, 4, ActivationFunctionEnum.Identity, 0);
+        var neutralLayer_1 = new LayerCaracteristics(LayerTypeEnum.Neutral, 1, 5, ActivationFunctionEnum.Tanh, 2);
+        var neutralLayer_2 = new LayerCaracteristics(LayerTypeEnum.Neutral, 2, 2, ActivationFunctionEnum.Tanh, 3);
+        var outputLayer = new LayerCaracteristics(LayerTypeEnum.Output, 2, 8, ActivationFunctionEnum.Sigmoid, 3);
+
         var networkCaracteristics = new List<BrainCaracteristics>
         {
             new BrainCaracteristics("Main")
             {
-                GeneNumber = 70,
-                InputNumber = 4,
-                OutputNumber = 8,
-                NeutralNumbers = new List<int> { 5 },
-                WeighBytesNumber = 3,
-                Tanh90Percent = 3,
-                Sigmoid90Percent = 3
+                InputLayer = inputLayer,
+                OutputLayer = outputLayer,
+                NeutralLayers = new List<LayerCaracteristics> { neutralLayer_1 },
+                GenomeCaracteristics = new GenomeCaracteristics
+                {
+                    GeneNumber = 30,
+                    WeighBytesNumber = 3
+                }
             }
         };
 

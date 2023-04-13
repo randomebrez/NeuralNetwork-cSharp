@@ -9,13 +9,15 @@ namespace BrainEncryption
 {
     public class GenomeManager : IGenome
     {
-        public Genome GenerateGenome(GenomeCaracteristics caracteristics)
+        public Genome GenerateGenome(GenomeCaracteristics caracteristics, HashSet<string> geneCodes)
         {
             var genome = new Genome(caracteristics.GeneNumber);
+            var geneCodeList = geneCodes.ToList();
+
             for (int i = 0; i < caracteristics.GeneNumber; i++)
             {
-                var geneCodeRandomIndex = StaticHelper.GetRandomValue(0, caracteristics.GeneCodes.Count - 1);
-                var geneCode = caracteristics.GeneCodes[geneCodeRandomIndex];
+                var geneCodeRandomIndex = StaticHelper.GetRandomValue(0, geneCodeList.Count - 1);
+                var geneCode = geneCodeList[geneCodeRandomIndex];
                 var gene = new Gene(geneCode, caracteristics.WeightBitArraySize);
                 RandomizeGeneBytes(gene);
                 genome.Genes[i] = gene;
@@ -91,7 +93,7 @@ namespace BrainEncryption
             return newGenome.DeepCopy();
         }
 
-        public Genome MutateGenome(Genome baseGenome, GenomeCaracteristics caracteristics, float geneMutationRate)
+        public Genome MutateGenome(Genome baseGenome, HashSet<string> geneCodes, float geneMutationRate)
         {
             // Check mutation actually occured on returned object
             foreach (var gene in baseGenome.Genes)
@@ -100,7 +102,7 @@ namespace BrainEncryption
                 if (mutationOccur == false)
                     continue;
 
-                MutateGene(gene, caracteristics.GeneCodes);
+                MutateGene(gene, geneCodes.ToList());
             }
             return baseGenome;
         }

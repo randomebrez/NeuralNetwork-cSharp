@@ -7,9 +7,9 @@ namespace NeuralNetwork.Helpers
 {
     public static class Mapper
     {
-        public static internalDtos.GenomeCaracteristics ToGenomeCaracteristic(this publicDtos.GenomeCaracteristics genomeCaracteristics, HashSet<string> geneCodes)
+        public static internalDtos.GenomeCaracteristics ToGenomeCaracteristic(this publicDtos.GenomeCaracteristics genomeCaracteristics)
         {
-            return new internalDtos.GenomeCaracteristics(genomeCaracteristics.GeneNumber, genomeCaracteristics.WeighBytesNumber, geneCodes);
+            return new internalDtos.GenomeCaracteristics(genomeCaracteristics.GeneNumber, genomeCaracteristics.WeighBytesNumber);
         }
 
         public static internalDtos.NetworkCaracteristics ToNetworkCaracteristic(this publicDtos.BrainCaracteristics brainCarac)
@@ -39,8 +39,8 @@ namespace NeuralNetwork.Helpers
         {
             switch(layerType)
             {
-                case publicDtos.LayerTypeEnum.Inputs:
-                    return internalDtos.LayerTypeEnum.Inputs;
+                case publicDtos.LayerTypeEnum.Input:
+                    return internalDtos.LayerTypeEnum.Input;
                 case publicDtos.LayerTypeEnum.Neutral:
                     return internalDtos.LayerTypeEnum.Neutral;
                 case publicDtos.LayerTypeEnum.Output:

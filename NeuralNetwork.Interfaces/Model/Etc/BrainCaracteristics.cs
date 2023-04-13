@@ -23,7 +23,5 @@ namespace NeuralNetwork.Interfaces.Model
 
         // Genome part
         public GenomeCaracteristics GenomeCaracteristics { get; set; }
-
-        public HashSet<string> GeneCodes { get; set; }
     }
 }

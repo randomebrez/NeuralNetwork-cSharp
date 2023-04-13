@@ -2,7 +2,7 @@
 {
     public enum LayerTypeEnum
     {
-        Inputs,
+        Input,
         Neutral,
         Output
     }

@@ -7,13 +7,13 @@ namespace BrainEncryption.Abstraction
     {
         HashSet<string> GetGeneCodes(NetworkCaracteristics caracteristics);
 
-        Genome GenerateGenome(GenomeCaracteristics caracteristics);
+        Genome GenerateGenome(GenomeCaracteristics caracteristics, HashSet<string> geneCodes);
 
         Genome GetGenomeFromString(string genomeString);
 
         Genome CrossOver(GenomeCaracteristics caracteristics, Genome genomeDtoA, Genome genomeDtoB, int crossOverNumber);
 
-        Genome MutateGenome(Genome baseGenome, GenomeCaracteristics caracteristics, float geneMutationRate);
+        Genome MutateGenome(Genome baseGenome, HashSet<string> geneCodes, float geneMutationRate);
 
         void TranslateGenome(Brain brain, Genome genome);
     }

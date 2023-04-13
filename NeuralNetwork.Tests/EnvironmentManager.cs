@@ -8,13 +8,14 @@ using NeuralNetwork.Interfaces.Model;
 using NeuralNetwork.Managers;
 using System.Linq;
 using NeuralNetwork.Tests.Model;
+using NeuralNetwork.Interfaces;
 
 namespace NeuralNetwork.Tests
 {
     public class EnvironmentManager
     {
-        private readonly DatabaseGateway _sqlGateway;
-        private readonly PopulationManager _populationManager;
+        private readonly IDatabaseGateway _sqlGateway;
+        private readonly IPopulationManager _populationManager;
 
         private int _maxPopulationNumber;
         private Dictionary<Guid, UnitManagerTest> _units = new Dictionary<Guid, UnitManagerTest>();
@@ -23,7 +24,7 @@ namespace NeuralNetwork.Tests
         private int _crossOverNumber;
         private float _mutationRate;
 
-        public EnvironmentManager(DatabaseGateway sqlGateway, List<BrainCaracteristics> networkCaracteristics, int maxPopulationNumber, int crossOverNumber, float mutationRate)
+        public EnvironmentManager(IDatabaseGateway sqlGateway, List<BrainCaracteristics> networkCaracteristics, int maxPopulationNumber, int crossOverNumber, float mutationRate)
         {
             _sqlGateway = sqlGateway;
             _populationManager = new PopulationManager();
