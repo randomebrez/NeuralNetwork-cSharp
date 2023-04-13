@@ -1,6 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 
-namespace NeuralNetwork.Helpers
+namespace BrainEncryption
 {
     public static class StaticHelper
     {
@@ -19,6 +20,12 @@ namespace NeuralNetwork.Helpers
         public static bool GetBooleanValue()
         {
             return _randomGenerator.Next(0, 2) == 1;
+        }
+
+        public static T DeepCopy<T>(this T self)
+        {
+            var serialized = JsonConvert.SerializeObject(self);
+            return JsonConvert.DeserializeObject<T>(serialized);
         }
 
         public static float Truncate(this float value, int numberOfDigits)

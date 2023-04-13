@@ -7,10 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+  </ItemGroup>
+	
+  <ItemGroup>
     <ProjectReference Include="..\BrainEncryption.Abstraction\BrainEncryption.Abstraction.csproj" />
-    <ProjectReference Include="..\BrainEncryption\BrainEncryption.csproj" />
-    <ProjectReference Include="..\NeuralNetwork.Database\NeuralNetwork.Database.csproj" />
-    <ProjectReference Include="..\NeuralNetwork.Interfaces\NeuralNetwork.Interfaces.csproj" />
   </ItemGroup>
 
 </Project>

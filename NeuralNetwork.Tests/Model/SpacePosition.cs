@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace NeuralNetwork.Interfaces.Model
+namespace NeuralNetwork.Tests.Model
 {
     public class SpacePosition
     {

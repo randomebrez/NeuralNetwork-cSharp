@@ -14,10 +14,12 @@ namespace NeuralNetwork.Implementations
     {
         private IDatabaseStorage _dbGateway;
 
+
         public DatabaseGateway(string sqlFilePath)
         {
             _dbGateway = new DatabaseStorage(sqlFilePath);
         }
+
 
         public async Task<int> AddNewSimulationAsync()
         {

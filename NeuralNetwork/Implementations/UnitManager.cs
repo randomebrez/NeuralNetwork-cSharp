@@ -1,130 +1,80 @@
-﻿using NeuralNetwork.Helpers;
+﻿using NeuralNetwork.Interfaces;
 using NeuralNetwork.Interfaces.Model;
-using NeuralNetwork.Managers;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-namespace NeuralNetwork.Implementations
+namespace NeuralNetwork.Managers
 {
-    public class UnitManager
+    public class UnitManager : IUnitBrains
     {
-        private readonly BrainManager _brainManager;
-        private readonly Dictionary<int, int> _selectedOuput = new Dictionary<int, int>();
         private readonly Unit _unit;
-        private string[] _positions;
 
-        public UnitManager(Brain brain, float[] startingPosition, int lifeTime, int generationId, int simulationId)
+
+        public UnitManager(Unit unit)
         {
-            _unit = new Unit
+            _unit = unit;
+        }
+
+
+        public void ComputeBrain(string brainKey, List<float> inputs)
+        {
+            var brain = _unit.Brains[brainKey].Brain;
+            InitialyzeInputNeuronsValue(brain, inputs);
+
+            for (int i = 1; i <= brain.OutputLayerId + 1; i++)
+                ComputeLayer(brain, i);
+        }
+
+        public (int ouputId, float neuronIntensity) GetBestOutput(string brainKey)
+        {
+            var brain = _unit.Brains[brainKey].Brain;
+            var bestOutputNeuron = GetBestOutput(brain);
+            return (bestOutputNeuron.Id, bestOutputNeuron.Value);
+        }
+
+        public List<float> GetOutputs(string brainKey)
+        {
+            var brain = _unit.Brains[brainKey].Brain;
+            return brain.Neurons.Outputs.Select(t => t.Value).ToList();
+        }
+
+
+
+        private void InitialyzeInputNeuronsValue(Brain brain, List<float> inputs)
+        {
+            for (int i = 0; i < brain.Neurons.Inputs.Count; i++)
             {
-                Identifier = Guid.NewGuid(),
-                Position = new SpacePosition(startingPosition),
-                LifeTime = lifeTime,
-                Fertile = true,
-                Brain = brain,
-                Age = 1,
-                GenerationId = generationId,
-                SimulationId = simulationId
-            };
-            _positions = new string[lifeTime + 1];
-            _positions[0] = _unit.Position.ToString();
-            _brainManager = new BrainManager(brain);
-        }
-
-        public Unit GetUnit => _unit;
-
-        public (Unit unit, string[] positions) GetUnitWithPositions => (_unit, _positions);
-
-        public void ExecuteAction(int actionNumber)
-        {
-            var inputs = GetDistanceToWalls();
-            var result = _brainManager.ComputeOutput(inputs.ToList());
-            ExecuteOutput(result.ouputId);
-            _positions[actionNumber] = _unit.Position.ToString();
-            _unit.Age++;
-        }
-
-        public Dictionary<int, int> GetLifeTimeOutputs => _selectedOuput;
-
-        private void StoreOutput(int outputId)
-        {
-            if (_selectedOuput.ContainsKey(outputId))
-                _selectedOuput[outputId]++;
-            else
-                _selectedOuput.Add(outputId, 1);
-        }
-
-        private void Move(int dimensionIndex, float value)
-        {
-            if (dimensionIndex >= StaticSpaceDimension.DimensionNumber)
-                throw new Exception(
-                    $"Cannot move to that direction. Max dimension {StaticSpaceDimension.DimensionNumber}. Requested: {dimensionIndex}");
-            var isMoveLegit = IsMoveLegit(dimensionIndex, value);
-            if (isMoveLegit.legit)
-                _unit.Position.SetCoordinate(dimensionIndex, isMoveLegit.finalPosition);
-        }
-
-        private (bool legit, float finalPosition) IsMoveLegit(int dimensionIndex, float value)
-        {
-            var result = _unit.Position.GetCoordinate(dimensionIndex) + value;
-            return (result <= StaticSpaceDimension.SpaceDimensions[dimensionIndex].max && result >= StaticSpaceDimension.SpaceDimensions[dimensionIndex].min, result);
-        }
-
-        private float[] GetDistanceToWalls()
-        {
-            var distances = new float[2 * StaticSpaceDimension.DimensionNumber];
-            for (int i = 0; i < StaticSpaceDimension.DimensionNumber; i++)
-            {
-                var maxDistance = Math.Abs(StaticSpaceDimension.SpaceDimensions[i].max - StaticSpaceDimension.SpaceDimensions[i].min);
-                distances[2 * i] = 1 - Math.Abs(StaticSpaceDimension.SpaceDimensions[i].max - _unit.Position.GetCoordinate(i)) / maxDistance;
-                distances[2 * i + 1] = 1 - Math.Abs(StaticSpaceDimension.SpaceDimensions[i].min - _unit.Position.GetCoordinate(i)) / maxDistance;
+                brain.Neurons.Inputs[i].Value = inputs[i];
+                brain.Neurons.Inputs[i].ActivationFunction();
             }
-            return distances;
         }
 
-        private void ExecuteOutput(int outputId)
+        private void ComputeLayer(Brain brain, int layerId)
         {
-            var jumpSize = 1f;
-            switch (outputId)
-            {
-                //Sink Output
-                case -1:
-                    var randomDimension = StaticHelper.GetRandomValue(0, StaticSpaceDimension.DimensionNumber - 1);
-                    var randomValue = StaticHelper.GetBooleanValue() ? 1 : -1;
-                    Move(randomDimension, randomValue);
-                    break;
-                case 0:
-                    Move(0, jumpSize);
-                    break;
-                case 1:
-                    Move(0, -jumpSize);
-                    break;
-                case 2:
-                    Move(1, jumpSize);
-                    break;
-                case 3:
-                    Move(1, -jumpSize);
-                    break;
-                case 4:
-                    Move(0, jumpSize / 2);
-                    Move(1, jumpSize / 2);
-                    break;
-                case 5:
-                    Move(0, -jumpSize / 2);
-                    Move(1, jumpSize / 2);
-                    break;
-                case 6:
-                    Move(0, -jumpSize / 2);
-                    Move(1, -jumpSize / 2);
-                    break;
-                case 7:
-                    Move(0, jumpSize / 2);
-                    Move(1, -jumpSize / 2);
-                    break;
-            }
+            var vertices = brain.Edges.Where(t => t.Target.Layer == layerId).ToList();
+            var groupedByTarget = vertices.GroupBy(t => t.Target.UniqueId);
 
+            foreach (var vertexBatch in groupedByTarget)
+            {
+                var targetNeuron = brain.Neurons.GetNeuronByName(vertexBatch.First().Target.UniqueId);
+                var computedValue = 0f;
+                foreach (var vertex in vertexBatch)
+                {
+                    var origin = brain.Neurons.GetNeuronByName(vertex.Origin.UniqueId);
+                    computedValue += origin.Value * vertex.Weight;
+                }
+                targetNeuron.Value = computedValue / vertexBatch.Count();
+                targetNeuron.ActivationFunction();
+            }
+        }
+
+        private Neuron GetBestOutput(Brain brain)
+        {
+            var bestOutput = brain.Neurons.Outputs.OrderBy(t => t.Value).Last();
+
+            return bestOutput.Value == 0f ?
+                brain.Neurons.SinkNeuron :
+                bestOutput;
         }
     }
 }

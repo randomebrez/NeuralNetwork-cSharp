@@ -6,25 +6,13 @@ namespace NeuralNetwork.Interfaces.Model
 {
     public class Brain
     {
-        public int Id { get; set; }
-
         public Guid UniqueIdentifier { get; set; }
 
         public BrainNeurons Neurons { get; set; }
 
         public List<Edge> Edges { get; set; }
 
-        public Genome Genome { get; set; }
-
-        public Guid ParentA { get; set; }
-
-        public Guid ParentB { get; set; }
-
-        public float Score { get; set; }
-
-        public int UseForChildCounter { get; set; }
-
-        public int MaxChildNumber { get; set; } = 3;
+        public int OutputLayerId { get; set; }
 
         private string _edgesString { get; set; }
 
