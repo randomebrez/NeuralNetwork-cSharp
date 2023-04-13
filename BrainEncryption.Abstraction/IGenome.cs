@@ -15,6 +15,6 @@ namespace BrainEncryption.Abstraction
 
         Genome MutateGenome(Genome baseGenome, GenomeCaracteristics caracteristics, float geneMutationRate);
 
-        Brain TranslateGenome(NetworkCaracteristics networkCarac, Genome genome);
+        void TranslateGenome(Brain brain, Genome genome);
     }
 }

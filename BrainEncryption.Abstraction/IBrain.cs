@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BrainEncryption.Abstraction.Model;
 
 namespace BrainEncryption.Abstraction
 {
-    internal interface IBrain
+    public interface IBrainBuilder
     {
+        Brain BuildBrain(NetworkCaracteristics caracteristics);
     }
 }

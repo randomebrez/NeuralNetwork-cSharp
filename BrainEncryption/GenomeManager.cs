@@ -26,29 +26,30 @@ namespace BrainEncryption
         public HashSet<string> GetGeneCodes(NetworkCaracteristics caracteristics)
         {
             var geneCodes = new HashSet<string>();
-            for (int input = 0; input < caracteristics.InputNumber; input++)
+            for (int input = 0; input < caracteristics.InputLayer.NeuronNumber; input++)
             {
-                for (int output = 0; output < caracteristics.OutputNumber; output++)
+                for (int output = 0; output < caracteristics.Outputlayer.NeuronNumber; output++)
                     geneCodes.Add($"I:{input}-O:{output}");
             }
 
-            for (int i = 0; i < caracteristics.NeutralNumbers.Count(); i++)
+            for (int i = 0; i < caracteristics.NeutralLayers.Count(); i++)
             {
-                for (int j = 0; j < caracteristics.NeutralNumbers[i]; j++)
+                var currentNeutralLayer = caracteristics.NeutralLayers[i];
+                for (int j = 0; j < currentNeutralLayer.NeuronNumber; j++)
                 {
                     // Input links
-                    for (int input = 0; input < caracteristics.InputNumber; input++)
-                        geneCodes.Add($"I:{input}-N{i + 1}:{j}");
+                    for (int input = 0; input < caracteristics.InputLayer.NeuronNumber; input++)
+                        geneCodes.Add($"I:{input}-N{currentNeutralLayer}:{j}");
 
                     // Output links
-                    for (int output = 0; output < caracteristics.OutputNumber; output++)
-                        geneCodes.Add($"N{i + 1}:{j}-O:{output}");
+                    for (int output = 0; output < caracteristics.Outputlayer.NeuronNumber; output++)
+                        geneCodes.Add($"N{currentNeutralLayer}:{j}-O:{output}");
 
-                    // Other neutral layers links
-                    for (int neutralLayer = i + 1; neutralLayer < caracteristics.NeutralNumbers.Count(); neutralLayer++)
+                    // Other neutral layers links (Neutral layerIds start from 1)
+                    for (int neutralLayer = currentNeutralLayer.LayerId; neutralLayer < caracteristics.NeutralLayers.Count(); neutralLayer++)
                     {
-                        for (int neutral = 0; neutral < caracteristics.NeutralNumbers[neutralLayer]; neutral++)
-                            geneCodes.Add($"N{i + 1}:{j}-N{neutralLayer + 1}:{neutral}");
+                        for (int neutral = 0; neutral < caracteristics.NeutralLayers[neutralLayer].NeuronNumber; neutral++)
+                            geneCodes.Add($"N{currentNeutralLayer.LayerId}:{j}-N{neutralLayer + 1}:{neutral}");
                     }
                 }
             }
@@ -104,9 +105,8 @@ namespace BrainEncryption
             return baseGenome;
         }
 
-        public Brain TranslateGenome(NetworkCaracteristics networkCarac, Genome genome)
+        public void TranslateGenome(Brain brain, Genome genome)
         {
-            var brain = new Brain(networkCarac.OutputLayerId);
             var edges = new List<Edge>();
             //Read each gene
             foreach (var geneGroup in genome.Genes.GroupBy(t => t.EdgeIdentifier))
@@ -118,7 +118,7 @@ namespace BrainEncryption
                         continue;
 
                     if (edge == null)
-                        edge = GetEdgeFromGene(networkCarac, gene, brain.Neurons);
+                        edge = GetEdgeFromGene(gene, brain.Neurons);
                     else
                     {
                         edge.Weight += ComputeEdgeWeigh(gene);
@@ -132,24 +132,18 @@ namespace BrainEncryption
             }
 
             brain.Edges = edges;
-
-            return brain;
         }
 
 
-        private Edge GetEdgeFromGene(NetworkCaracteristics networkCarac, Gene gene, BrainNeurons neurons)
+        private Edge GetEdgeFromGene(Gene gene, BrainNeurons neurons)
         {
-            var NeuronIdentifiers = gene.EdgeIdentifier.Split('-');
-            if (neurons.GetNeuronByName(NeuronIdentifiers[0]) == null)
-                neurons.AddNeuron(BuildNeuron(networkCarac, NeuronIdentifiers[0]));
-            if (neurons.GetNeuronByName(NeuronIdentifiers[1]) == null)
-                neurons.AddNeuron(BuildNeuron(networkCarac, NeuronIdentifiers[1]));
+            var neuronIdentifiers = gene.EdgeIdentifier.Split('-');
 
             return new Edge
             {
                 Identifier = gene.EdgeIdentifier,
-                Origin = neurons.GetNeuronByName(NeuronIdentifiers[0]),
-                Target = neurons.GetNeuronByName(NeuronIdentifiers[1]),
+                Origin = neurons.GetNeuronByName(neuronIdentifiers[0]),
+                Target = neurons.GetNeuronByName(neuronIdentifiers[1]),
                 Weight = ComputeEdgeWeigh(gene)
             };
         }
@@ -166,24 +160,6 @@ namespace BrainEncryption
             }
             weighResult /= gene.EdgeWeightMaxValue;
             return gene.WeighSign ? weighResult : weighResult * (-1);
-        }
-
-        private Neuron BuildNeuron(NetworkCaracteristics networkCarac, string identifier)
-        {
-            var splitGene = identifier.Split(':');
-            var neuronId = splitGene[1];
-            switch (splitGene[0][0])
-            {
-                case 'I':
-                    return new NeuronInput(int.Parse(neuronId), 0);
-                case 'N':
-                    var stringLayer = splitGene[0].Split('N').Last();
-                    var layerId = int.Parse(stringLayer);
-                    return new NeuronNeutral(int.Parse(neuronId), layerId, networkCarac.Tanh90Percent);
-                case 'O':
-                    return new NeuronOutput(int.Parse(neuronId), networkCarac.OutputLayerId, networkCarac.Sigmoid90Percent);
-            }
-            return null;
         }
 
         private void RandomizeGeneBytes(Gene gene)

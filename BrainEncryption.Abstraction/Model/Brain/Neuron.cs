@@ -1,16 +1,15 @@
-﻿using System;
-
-namespace BrainEncryption.Abstraction.Model
+﻿namespace BrainEncryption.Abstraction.Model
 {
     public abstract class Neuron
     {
-        public Neuron(int id, int layerId)
+        public Neuron(int id, int layerId, ActivationFunctionEnum activationFunction)
         {
             Id = id;
             LayerId = layerId;
+            ActivationFunction = activationFunction;
         }
 
-        public int Id { get; private set; }
+        public int Id { get; }
 
         public abstract string UniqueId { get; }
         
@@ -18,14 +17,15 @@ namespace BrainEncryption.Abstraction.Model
 
         public virtual bool CanBeTarget { get => false; }
 
-        public int LayerId { get; set; }
+        public int LayerId { get; }
+
+        public ActivationFunctionEnum ActivationFunction { get; }
     }
 
     public class NeuronInput : Neuron
     {
-        public NeuronInput(int id, int layerId) : base(id, layerId)
+        public NeuronInput(int id, int layerId, ActivationFunctionEnum activationFunction) : base(id, layerId, activationFunction)
         {
-            
         }
 
         public override string UniqueId => $"I:{Id}";
@@ -35,9 +35,9 @@ namespace BrainEncryption.Abstraction.Model
 
     public class NeuronNeutral : Neuron
     {
-        public NeuronNeutral(int id, int layerId, float tanh90percent) : base(id, layerId)
+        public NeuronNeutral(int id, int layerId, ActivationFunctionEnum activationFunction, float curveModifier) : base(id, layerId, activationFunction)
         {
-            CurveModifier = (float)((0.5f / tanh90percent) * (Math.Log(1.9) - Math.Log(0.1)));
+            CurveModifier = curveModifier;
         }
 
         public override string UniqueId => $"N{LayerId}:{Id}";
@@ -46,20 +46,20 @@ namespace BrainEncryption.Abstraction.Model
 
         public override bool CanBeTarget { get => true; }
 
-        public float CurveModifier;
+        public float CurveModifier { get; }
     }
 
     public class NeuronOutput : Neuron
     {
-        public NeuronOutput(int id, int layerId, float sigmoid90percent) : base(id, layerId)
+        public NeuronOutput(int id, int layerId, ActivationFunctionEnum activationFunction, float curveModifier) : base(id, layerId, activationFunction)
         {
-            CurveModifier = (float)Math.Log(9) / sigmoid90percent;
+            CurveModifier = curveModifier;
         }
 
         public override string UniqueId => $"O:{Id}";
 
         public override bool CanBeTarget { get => true; }
 
-        public float CurveModifier { get; set; }
+        public float CurveModifier { get; }
     }
 }

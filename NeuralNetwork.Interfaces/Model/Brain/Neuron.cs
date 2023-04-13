@@ -18,40 +18,48 @@ namespace NeuralNetwork.Interfaces.Model
 
         public float Treshold { get; set; }
 
-        public abstract void ActivationFunction();
+        public float CurveModifier { get; set; }
+
+        public ActivationFunctionEnum ActivationFunctionType { get; set; }
+
+        public virtual void ActivationFunction()
+        {
+            switch (ActivationFunctionType)
+            {
+                case ActivationFunctionEnum.ConstantOne:
+                    Value = 1;
+                    return;
+                case ActivationFunctionEnum.ConstantZero:
+                    Value = 0;
+                    return;
+                case ActivationFunctionEnum.Tanh:
+                    var expoTanh = Math.Exp(-2 * Value * CurveModifier);
+                    var resultTanh = (float)((1 - expoTanh) / (1 + expoTanh));
+                    Value = resultTanh;
+                    break;
+                case ActivationFunctionEnum.Sigmoid:
+                    var expoSigmoid = Math.Exp(-Value * CurveModifier);
+                    var resultSigmoid = (float)(1 / (1 + expoSigmoid));
+                    Value = resultSigmoid < Treshold ? 0 : resultSigmoid;
+                    break;
+                case ActivationFunctionEnum.Identity:
+                    break;
+            }
+        }
     }
 
     public class NeuronInput : Neuron
     {
-        public override void ActivationFunction()
-        {
-            // Don't do anything for input neurons
-        }
+
     }
 
     public class NeuronNeutral : Neuron
     {
-        public float CurveModifier { get; set; }
 
-        public override void ActivationFunction()
-        {
-            // tanh for neutral neurons
-            var expo = Math.Exp(- 2 * Value * CurveModifier);
-            var result = (float)((1 - expo) / (1 + expo));
-            Value = result;
-        }
     }
 
     public class NeuronOutput : Neuron
     {
-        public float CurveModifier { get; set; }
 
-        public override void ActivationFunction()
-        {
-            //sigmoid for output neurons
-            var expo = Math.Exp(- Value * CurveModifier);
-            var result = (float)(1 / (1 + expo));
-            Value = result < Treshold ? 0 : result;
-        }
     }
 }

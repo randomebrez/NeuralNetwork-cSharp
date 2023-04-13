@@ -9,7 +9,7 @@ namespace BrainEncryption.Abstraction.Model
         {
             UniqueIdentifier = Guid.NewGuid();
             Edges = new List<Edge>();
-            Neurons = new BrainNeurons(outputLayerId);
+            Neurons = new BrainNeurons();
             OutputLayerId = outputLayerId;
         }
 
@@ -20,9 +20,5 @@ namespace BrainEncryption.Abstraction.Model
         public BrainNeurons Neurons { get; set; }
 
         public int OutputLayerId { get; set; }
-
-        public int UseForChildCounter { get; set; }
-
-        public int MaxChildNumber { get; set; } = 3;
     }
 }

@@ -6,20 +6,18 @@ using System.Linq;
 using System;
 using BrainEncryption.Abstraction;
 using BrainEncryption;
-using BrainEncryption.Abstraction.Model;
-using NeuralNetwork.DataBase.Abstraction.Model;
 
 namespace NeuralNetwork.Managers
 {
     public class PopulationManager : IPopulationManager
     {
         private IGenome _genomeEncryption;
-
+        private IBrainBuilder _brainBuilder;
 
         public PopulationManager()
         {
-
             _genomeEncryption = new GenomeManager();
+            _brainBuilder = new BrainBuilder();
         }
 
 
@@ -63,8 +61,9 @@ namespace NeuralNetwork.Managers
             for (int i = 0; i < genomeStrings.Count; i++)
             {
                 var unit = new Unit();
+                var brain = _brainBuilder.BuildBrain(brainCaracteristic.ToNetworkCaracteristic());
                 var genome = _genomeEncryption.GetGenomeFromString(genomeStrings[i]);
-                var brain = _genomeEncryption.TranslateGenome(brainCaracteristic.ToNetworkCaracteristic(), genome);
+                _genomeEncryption.TranslateGenome(brain, genome);
 
                 var pair = new BrainGenomePair
                 {
@@ -92,10 +91,23 @@ namespace NeuralNetwork.Managers
 
             foreach (var brainCarac in brainCaracteristics)
             {
-                var genomeCarac = brainCarac.ToGenomeCaracteristic();
-                var mixedGenome = _genomeEncryption.CrossOver(genomeCarac, _genomeEncryption.GetGenomeFromString(parentA.Brains[brainCarac.Name].Genome.GenomeToString), _genomeEncryption.GetGenomeFromString(parentB.Brains[brainCarac.Name].Genome.GenomeToString), crossOverNumber);
+                var mappedBrainCarac = brainCarac.ToNetworkCaracteristic();
+                var geneCodes = _genomeEncryption.GetGeneCodes(mappedBrainCarac);
+                var genomeCarac = brainCarac.GenomeCaracteristics.ToGenomeCaracteristic(geneCodes);
+
+                //Build brain structure
+                var brain = _brainBuilder.BuildBrain(mappedBrainCarac);
+
+                // Cross over genomes
+                var genomeA = _genomeEncryption.GetGenomeFromString(parentA.Brains[brainCarac.Name].Genome.GenomeToString);
+                var genomeB = _genomeEncryption.GetGenomeFromString(parentB.Brains[brainCarac.Name].Genome.GenomeToString);
+                var mixedGenome = _genomeEncryption.CrossOver(genomeCarac, genomeA, genomeB, crossOverNumber);
+
+                // Apply mutation on generated genome
                 var mutatedGenome = _genomeEncryption.MutateGenome(mixedGenome, genomeCarac, mutationRate);
-                var brain = _genomeEncryption.TranslateGenome(brainCarac.ToNetworkCaracteristic(), mutatedGenome);
+
+                // Fill in brain's edges
+                _genomeEncryption.TranslateGenome(brain, mutatedGenome);
 
                 var pair = new BrainGenomePair
                 {
@@ -119,8 +131,8 @@ namespace NeuralNetwork.Managers
             var firstLoop = true;
             foreach (var brainCarac in brainCaracteristics)
             {
-                brainCarac.GeneCodes = _genomeEncryption.GetGeneCodes(brainCarac.ToNetworkCaracteristic());
-                var genomeCarac = brainCarac.ToGenomeCaracteristic();
+                var geneCodes = _genomeEncryption.GetGeneCodes(brainCarac.ToNetworkCaracteristic());
+                var genomeCarac = brainCarac.GenomeCaracteristics.ToGenomeCaracteristic(geneCodes);
                 var networkCarac = brainCarac.ToNetworkCaracteristic();
                 for (int i = 0; i < childNumber; i++)
                 {
@@ -130,15 +142,17 @@ namespace NeuralNetwork.Managers
 
                     var unit = result[i];
 
+                    // Build brain neurons
+                    var brain = _brainBuilder.BuildBrain(networkCarac);
                     // Generate genome
                     var newGenome = _genomeEncryption.GenerateGenome(genomeCarac);
-                    // Translate it to a brain
-                    var newBrain = _genomeEncryption.TranslateGenome(networkCarac, newGenome);
+                    // Translate it to generate brain's edges
+                    _genomeEncryption.TranslateGenome(brain, newGenome);
 
                     var pair = new BrainGenomePair
                     {
                         Key = brainCarac.Name,
-                        Brain = newBrain.ToPublic(),
+                        Brain = brain.ToPublic(),
                         Genome = newGenome.ToPublic()
                     };
                     unit.Brains.Add(brainCarac.Name, pair);
