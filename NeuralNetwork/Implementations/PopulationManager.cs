@@ -6,6 +6,7 @@ using System.Linq;
 using System;
 using BrainEncryption.Abstraction;
 using BrainEncryption;
+using NeuralNetwork.Interfaces.Model.Etc;
 
 namespace NeuralNetwork.Managers
 {
@@ -26,7 +27,7 @@ namespace NeuralNetwork.Managers
             return GenerateRandomUnits(childNumber, brainCaracteristics);
         }
 
-        public Unit[] GenerateNewGeneration(int childNumber, List<Unit> selectedUnits, List<BrainCaracteristics> brainCaracteristics, int crossOverNumber, float mutationRate)
+        public Unit[] GenerateNewGeneration(int childNumber, List<Unit> selectedUnits, List<BrainCaracteristics> brainCaracteristics, ReproductionCaracteristics reproductionCaracteristics)
         {
             var newUnits = new Unit[childNumber];
 
@@ -34,7 +35,7 @@ namespace NeuralNetwork.Managers
             var fertileUnits = selectedUnits;
             while (currentUnitCount < childNumber && fertileUnits.Count > 1)
             {
-                newUnits[currentUnitCount] = GetChild(fertileUnits, brainCaracteristics, crossOverNumber, mutationRate);
+                newUnits[currentUnitCount] = GetChild(fertileUnits, brainCaracteristics, reproductionCaracteristics.CrossOverNumber, reproductionCaracteristics.MutationRate);
                 fertileUnits = fertileUnits.Where(t => t.UseForChildCounter < t.MaxChildNumber).ToList();
                 currentUnitCount++;
             }

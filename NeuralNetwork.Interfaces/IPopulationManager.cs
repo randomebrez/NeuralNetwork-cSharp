@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using NeuralNetwork.Interfaces.Model;
+using NeuralNetwork.Interfaces.Model.Etc;
 
 namespace NeuralNetwork.Interfaces
 {
@@ -7,7 +8,7 @@ namespace NeuralNetwork.Interfaces
     {
         Unit[] GenerateFirstGeneration(int childNumber, List<BrainCaracteristics> brainCaracteristics);
 
-        Unit[] GenerateNewGeneration(int childNumber, List<Unit> selectedUnits, List<BrainCaracteristics> brainCaracteristics, int crossOverNumber, float mutationRate);
+        Unit[] GenerateNewGeneration(int childNumber, List<Unit> selectedUnits, List<BrainCaracteristics> brainCaracteristics, ReproductionCaracteristics reproductionCaracteristics);
 
         Unit[] GetUnitFromGenomes(BrainCaracteristics brainCaracteristic, List<string> genomeStrings);
     }

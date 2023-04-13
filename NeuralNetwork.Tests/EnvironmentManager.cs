@@ -3,12 +3,12 @@ using System;
 using System.Text;
 using System.Threading.Tasks;
 using NeuralNetwork.Helpers;
-using NeuralNetwork.Implementations;
 using NeuralNetwork.Interfaces.Model;
 using NeuralNetwork.Managers;
 using System.Linq;
 using NeuralNetwork.Tests.Model;
 using NeuralNetwork.Interfaces;
+using NeuralNetwork.Interfaces.Model.Etc;
 
 namespace NeuralNetwork.Tests
 {
@@ -16,25 +16,23 @@ namespace NeuralNetwork.Tests
     {
         private readonly IDatabaseGateway _sqlGateway;
         private readonly IPopulationManager _populationManager;
+        private readonly List<BrainCaracteristics> _networkCaracteristics;
+        private readonly ReproductionCaracteristics _reproductionCaracteristics;
 
         private int _maxPopulationNumber;
         private Dictionary<Guid, UnitManagerTest> _units = new Dictionary<Guid, UnitManagerTest>();
         private List<UnitTest> _selectedBrains = new List<UnitTest>();
-        private readonly List<BrainCaracteristics> _networkCaracteristics;
-        private int _crossOverNumber;
-        private float _mutationRate;
 
-        public EnvironmentManager(IDatabaseGateway sqlGateway, List<BrainCaracteristics> networkCaracteristics, int maxPopulationNumber, int crossOverNumber, float mutationRate)
+        public EnvironmentManager(IDatabaseGateway sqlGateway, List<BrainCaracteristics> networkCaracteristics, int maxPopulationNumber, ReproductionCaracteristics reproductionCaracteristics)
         {
             _sqlGateway = sqlGateway;
             _populationManager = new PopulationManager();
             _maxPopulationNumber = maxPopulationNumber;
             _networkCaracteristics = networkCaracteristics;
-            _crossOverNumber = crossOverNumber;
-            _mutationRate = mutationRate;
+            _reproductionCaracteristics = reproductionCaracteristics;
         }
 
-        public async Task<string> ExecuteLifeAsync(int[] spaceDimensions, int maxNumberOfGeneration, int unitLifeTime, float selectionRadius, int numberOfBestToTake, int meanChildNumber)
+        public async Task<string> ExecuteLifeAsync(int[] spaceDimensions, int maxNumberOfGeneration, int unitLifeTime, float selectionRadius)
         {
             var logs = new StringBuilder();
             var simulationId = await _sqlGateway.AddNewSimulationAsync();
@@ -60,7 +58,7 @@ namespace NeuralNetwork.Tests
                 currentLog.AppendLine(await ExecuteGenerationLifeAsync().ConfigureAwait(false));
 
                 //Select The Best
-                var survivorNumber = SelectBestUnitsCircular(selectionRadius * StaticSpaceDimension.SpaceDimensions[0].max, meanChildNumber, numberOfBestToTake);
+                var survivorNumber = SelectBestUnitsCircular(selectionRadius * StaticSpaceDimension.SpaceDimensions[0].max);
                 //var survivorNumber = SelectBestUnitsLateral(0.1f);
 
 
@@ -111,7 +109,7 @@ namespace NeuralNetwork.Tests
             _units.Clear();
             Unit[] brains;
             if (_selectedBrains.Any())
-                brains = _populationManager.GenerateNewGeneration(_maxPopulationNumber, _selectedBrains.Select(t => t.Unit).ToList(), _networkCaracteristics, _crossOverNumber, _mutationRate);
+                brains = _populationManager.GenerateNewGeneration(_maxPopulationNumber, _selectedBrains.Select(t => t.Unit).ToList(), _networkCaracteristics, _reproductionCaracteristics);
             else
                 brains = _populationManager.GenerateFirstGeneration(_maxPopulationNumber, _networkCaracteristics);
             for (var index = 0; index < brains.Length; index++)
@@ -163,7 +161,7 @@ namespace NeuralNetwork.Tests
             return survivorNumber;
         }
 
-        private int SelectBestUnitsCircular(float radius, int meanChildNumber, int? maxNumberToTake)
+        private int SelectBestUnitsCircular(float radius)
         {
             _selectedBrains.Clear();
             var radiusforSurvivor = radius * radius;
@@ -177,18 +175,19 @@ namespace NeuralNetwork.Tests
             }
             var selectedUnits = unitCenterDistances.OrderBy(t => t.Value);
             var survivorNumber = unitCenterDistances.Where(t => t.Value < radiusforSurvivor).Count();
-            foreach (var unitPair in selectedUnits.Take(maxNumberToTake ?? survivorNumber))
+            var maxNumberToTake = 100 * _reproductionCaracteristics.PercentToSelect / _maxPopulationNumber;
+            foreach (var unitPair in selectedUnits.Take(maxNumberToTake))
                 _selectedBrains.Add(_units[unitPair.Key].GetUnit);
 
             var index1 = _selectedBrains.Count / 3;
             for (int i = 0; i < _selectedBrains.Count; i++)
             {
                 if (i < index1)
-                    _selectedBrains[i].Unit.MaxChildNumber = meanChildNumber + meanChildNumber / 2;
+                    _selectedBrains[i].Unit.MaxChildNumber = _reproductionCaracteristics.MeanChildNumberByUnit + _reproductionCaracteristics.MeanChildNumberByUnit / 2;
                 else if (i < _selectedBrains.Count - index1)
-                    _selectedBrains[i].Unit.MaxChildNumber = meanChildNumber;
+                    _selectedBrains[i].Unit.MaxChildNumber = _reproductionCaracteristics.MeanChildNumberByUnit;
                 else
-                    _selectedBrains[i].Unit.MaxChildNumber = meanChildNumber - meanChildNumber / 2;
+                    _selectedBrains[i].Unit.MaxChildNumber = _reproductionCaracteristics.MeanChildNumberByUnit - _reproductionCaracteristics.MeanChildNumberByUnit / 2;
             }
 
             if (selectedUnits.Any())
