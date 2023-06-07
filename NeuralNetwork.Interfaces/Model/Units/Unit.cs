@@ -19,6 +19,10 @@ namespace NeuralNetwork.Interfaces.Model
 
         public Dictionary<string, BrainGenomePair> Brains { get; set; }
 
+        public GenomeGraph GenomeGraph { get; set; }
+
+        public BrainGraph BrainGraph { get; set; }
+
         public int UseForChildCounter { get; set; }
 
         public int MaxChildNumber { get; set; } = 3;

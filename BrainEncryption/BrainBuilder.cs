@@ -10,7 +10,7 @@ namespace BrainEncryption
     {
         public Brain BuildBrain(NetworkCaracteristics caracteristics)
         {
-            var result = new Brain(caracteristics.OutputLayerId);
+            var result = new Brain(caracteristics.OutputLayerId, caracteristics.BrainName);
 
             // Build Inputs
             result.Neurons.Inputs = BuildInputs(caracteristics.InputLayer);
@@ -79,8 +79,5 @@ namespace BrainEncryption
                     return 1;
             }
         }
-
-        //(float)((0.5f / activationFunctionTreshold) * (Math.Log(1.9) - Math.Log(0.1)));
-        // (float)Math.Log(9) / sigmoid90percent;
     }
 }

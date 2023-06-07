@@ -11,5 +11,8 @@ namespace NeuralNetwork.Interfaces
         Unit[] GenerateNewGeneration(int childNumber, List<Unit> selectedUnits, List<BrainCaracteristics> brainCaracteristics, ReproductionCaracteristics reproductionCaracteristics);
 
         Unit[] GetUnitFromGenomes(BrainCaracteristics brainCaracteristic, List<string> genomeStrings);
+
+
+        void DuplicateBrain(Unit unit, string brainKey, string newBrainKey);
     }
 }

@@ -4,13 +4,16 @@ namespace NeuralNetwork.Interfaces.Model
 {
     public class BrainCaracteristics
     {
-        public BrainCaracteristics(string name)
+        public BrainCaracteristics()
         {
             NeutralLayers = new List<LayerCaracteristics>();
-            Name = name;
         }
 
-        public string Name { get; set; }
+        public string TemplateName { get; set; }
+
+        public string BrainName { get; set; }
+
+        public bool IsDecisionBrain { get; set; }
 
 
         // Neural network part

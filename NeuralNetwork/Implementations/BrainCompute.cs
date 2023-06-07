@@ -3,39 +3,16 @@ using NeuralNetwork.Interfaces.Model;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace NeuralNetwork.Managers
+namespace NeuralNetwork.Implementations
 {
-    public class UnitManager : IUnitBrains
+    public class BrainCompute : IBrain
     {
-        private readonly Unit _unit;
-
-
-        public UnitManager(Unit unit)
+        public void ComputeBrain(Brain brain, List<float> inputs)
         {
-            _unit = unit;
-        }
-
-
-        public void ComputeBrain(string brainKey, List<float> inputs)
-        {
-            var brain = _unit.Brains[brainKey].Brain;
             InitialyzeInputNeuronsValue(brain, inputs);
 
             for (int i = 1; i <= brain.OutputLayerId + 1; i++)
                 ComputeLayer(brain, i);
-        }
-
-        public (int ouputId, float neuronIntensity) GetBestOutput(string brainKey)
-        {
-            var brain = _unit.Brains[brainKey].Brain;
-            var bestOutputNeuron = GetBestOutput(brain);
-            return (bestOutputNeuron.Id, bestOutputNeuron.Value);
-        }
-
-        public List<float> GetOutputs(string brainKey)
-        {
-            var brain = _unit.Brains[brainKey].Brain;
-            return brain.Neurons.Outputs.Select(t => t.Value).ToList();
         }
 
         private void InitialyzeInputNeuronsValue(Brain brain, List<float> inputs)
@@ -66,13 +43,25 @@ namespace NeuralNetwork.Managers
             }
         }
 
-        private Neuron GetBestOutput(Brain brain)
+        public List<float> ComputeBrainGraph(BrainGraph graph, Dictionary<string, List<float>> inputs)
         {
-            var bestOutput = brain.Neurons.Outputs.OrderBy(t => t.Value).Last();
+            return ComputeRec(graph.DecisionBrain, graph, inputs);
+        }
 
-            return bestOutput.Value == 0f ?
-                brain.Neurons.SinkNeuron :
-                bestOutput;
+        private List<float> ComputeRec(Brain currentBrain, BrainGraph graph, Dictionary<string, List<float>> inputs)
+        {
+            var inputToUse = new List<float>();
+            if (graph.BrainEdges.TryGetValue(currentBrain.Name, out var originBrains))
+            {
+                foreach (var brain in originBrains)
+                    inputToUse.AddRange(ComputeRec(brain, graph, inputs));
+            }
+            if (inputs.TryGetValue(currentBrain.Name, out var brainInputs))
+                inputToUse.AddRange(brainInputs);
+
+
+            ComputeBrain(currentBrain, inputToUse);
+            return currentBrain.Neurons.Outputs.Select(t => t.Value).ToList();
         }
     }
 }

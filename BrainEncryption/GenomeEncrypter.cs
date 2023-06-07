@@ -7,7 +7,7 @@ using System.Text;
 
 namespace BrainEncryption
 {
-    public class GenomeManager : IGenome
+    public class GenomeEncrypter : IGenome
     {
         public Genome GenerateGenome(GenomeCaracteristics caracteristics, HashSet<string> geneCodes)
         {
@@ -108,7 +108,7 @@ namespace BrainEncryption
         }
 
         public void TranslateGenome(Brain brain, Genome genome)
-        {
+        {   
             var edges = new List<Edge>();
             //Read each gene
             foreach (var geneGroup in genome.Genes.GroupBy(t => t.EdgeIdentifier))

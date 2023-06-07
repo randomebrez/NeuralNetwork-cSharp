@@ -10,6 +10,10 @@ namespace BrainEncryption.Abstraction.Model
             NeutralLayers = new List<LayerCaracteristics>();
         }
 
+        public string CaracteristicTemplateName { get; set; }
+
+        public string BrainName { get; set; }
+
         public LayerCaracteristics InputLayer { get; set; }
 
         public List<LayerCaracteristics> NeutralLayers { get; set; }

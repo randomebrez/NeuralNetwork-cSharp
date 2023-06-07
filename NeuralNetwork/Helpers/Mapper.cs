@@ -16,6 +16,7 @@ namespace NeuralNetwork.Helpers
         {
             return new internalDtos.NetworkCaracteristics
             {
+                BrainName = brainCarac.BrainName,
                 InputLayer = brainCarac.InputLayer.ToInternal(),
                 NeutralLayers = brainCarac.NeutralLayers.Select(t => t.ToInternal()).ToList(),
                 Outputlayer = brainCarac.OutputLayer.ToInternal()
@@ -28,6 +29,7 @@ namespace NeuralNetwork.Helpers
             return new internalDtos.LayerCaracteristics(layerCaracteristic.Type.ToInternal())
             {
                 NeuronNumber = layerCaracteristic.NeuronNumber,
+                //Todo : a delete
                 LayerId = layerCaracteristic.LayerId,
                 ActivationFunction = layerCaracteristic.ActivationFunction.ToInternal(),
                 ActivationFunction90PercentTreshold = layerCaracteristic.ActivationFunction90PercentTreshold
@@ -112,12 +114,31 @@ namespace NeuralNetwork.Helpers
             };
         }
 
+        public static internalDtos.Genome ToInternal(this publicDtos.Genome genome)
+        {
+            return new internalDtos.Genome(genome.GeneNumber)
+            {
+                Genes = genome.Genes.Select(t => t.ToInternal()).ToArray(),
+            };
+        }
+
+        public static internalDtos.Gene ToInternal(this publicDtos.Gene gene)
+        {
+            return new internalDtos.Gene(gene.EdgeIdentifier, gene.WeighBits.Length)
+            {
+                WeighSign = gene.WeighSign,
+                WeighBits = gene.WeighBits,
+                Bias = gene.Bias,
+                IsActive = gene.IsActive
+            };
+        }
+
 
         public static publicDtos.Brain ToPublic(this internalDtos.Brain brain)
         {
             return new publicDtos.Brain
             {
-                UniqueIdentifier = brain.UniqueIdentifier,
+                Name = brain.Name,
                 Edges = brain.Edges.Select(t => t.ToPublic()).ToList(),
                 Neurons = brain.Neurons.ToPublic(),
                 OutputLayerId = brain.OutputLayerId

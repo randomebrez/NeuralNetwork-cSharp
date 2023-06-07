@@ -7,6 +7,7 @@
             Type = type;
         }
 
+        //ToDo : a delete
         public int LayerId { get; set; }
 
         public LayerTypeEnum Type { get; }

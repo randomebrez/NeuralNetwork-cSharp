@@ -7,5 +7,7 @@
         public Brain Brain { get; set; }
 
         public Genome Genome { get; set; }
+
+        public BrainCaracteristics Caracteristics { get; set; }
     }
 }

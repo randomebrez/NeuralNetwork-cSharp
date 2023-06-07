@@ -1,12 +1,11 @@
 ﻿using System.Text;
 using System.Collections.Generic;
-using System;
 
 namespace NeuralNetwork.Interfaces.Model
 {
     public class Brain
     {
-        public Guid UniqueIdentifier { get; set; }
+        public string Name { get; set; }
 
         public BrainNeurons Neurons { get; set; }
 

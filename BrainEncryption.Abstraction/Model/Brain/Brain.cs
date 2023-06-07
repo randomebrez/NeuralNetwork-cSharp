@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace BrainEncryption.Abstraction.Model
 {
     public class Brain
     {
-        public Brain(int outputLayerId)
+        public Brain(int outputLayerId, string name)
         {
-            UniqueIdentifier = Guid.NewGuid();
+            Name = name;
             Edges = new List<Edge>();
             Neurons = new BrainNeurons();
             OutputLayerId = outputLayerId;
         }
 
-        public Guid UniqueIdentifier { get; private set; }
+        public string Name { get; private set; }
 
         public List<Edge> Edges { get; set; }
 

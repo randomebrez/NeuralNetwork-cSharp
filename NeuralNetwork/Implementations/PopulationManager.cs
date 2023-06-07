@@ -17,7 +17,7 @@ namespace NeuralNetwork.Managers
 
         public PopulationManager()
         {
-            _genomeEncryption = new GenomeManager();
+            _genomeEncryption = new GenomeEncrypter();
             _brainBuilder = new BrainBuilder();
         }
 
@@ -68,11 +68,12 @@ namespace NeuralNetwork.Managers
 
                 var pair = new BrainGenomePair
                 {
-                    Key = brainCaracteristic.Name,
+                    Key = brainCaracteristic.TemplateName,
                     Brain = brain.ToPublic(),
-                    Genome = genome.ToPublic()
+                    Genome = genome.ToPublic(),
+                    Caracteristics = brainCaracteristic
                 };
-                unit.Brains.Add(brainCaracteristic.Name, pair);
+                unit.Brains.Add(brainCaracteristic.TemplateName, pair);
             }
 
             return units;
@@ -100,8 +101,8 @@ namespace NeuralNetwork.Managers
                 var brain = _brainBuilder.BuildBrain(mappedBrainCarac);
 
                 // Cross over genomes
-                var genomeA = _genomeEncryption.GetGenomeFromString(parentA.Brains[brainCarac.Name].Genome.GenomeToString);
-                var genomeB = _genomeEncryption.GetGenomeFromString(parentB.Brains[brainCarac.Name].Genome.GenomeToString);
+                var genomeA = _genomeEncryption.GetGenomeFromString(parentA.Brains[brainCarac.TemplateName].Genome.GenomeToString);
+                var genomeB = _genomeEncryption.GetGenomeFromString(parentB.Brains[brainCarac.TemplateName].Genome.GenomeToString);
                 var mixedGenome = _genomeEncryption.CrossOver(genomeCarac, genomeA, genomeB, crossOverNumber);
 
                 // Apply mutation on generated genome
@@ -112,11 +113,12 @@ namespace NeuralNetwork.Managers
 
                 var pair = new BrainGenomePair
                 {
-                    Key = brainCarac.Name,
+                    Key = brainCarac.TemplateName,
                     Brain = brain.ToPublic(),
-                    Genome = mutatedGenome.ToPublic()
+                    Genome = mutatedGenome.ToPublic(),
+                    Caracteristics = brainCarac
                 };
-                unit.Brains.Add(brainCarac.Name, pair);
+                unit.Brains.Add(brainCarac.TemplateName, pair);
                 unit.ParentA = parentA.Identifier;
                 unit.ParentB = parentB.Identifier;
             }
@@ -152,16 +154,32 @@ namespace NeuralNetwork.Managers
 
                     var pair = new BrainGenomePair
                     {
-                        Key = brainCarac.Name,
+                        Key = brainCarac.TemplateName,
                         Brain = brain.ToPublic(),
-                        Genome = newGenome.ToPublic()
+                        Genome = newGenome.ToPublic(),
+                        Caracteristics = brainCarac
                     };
-                    unit.Brains.Add(brainCarac.Name, pair);
+                    unit.Brains.Add(brainCarac.TemplateName, pair);
                 }
 
                 firstLoop = false;
             }
             return result;
+        }
+
+        public void DuplicateBrain(Unit unit, string brainKey, string newBrainKey)
+        {
+            var brainGenome = unit.Brains[brainKey].Genome;
+            var brain = _brainBuilder.BuildBrain(unit.Brains[brainKey].Caracteristics.ToNetworkCaracteristic());
+            _genomeEncryption.TranslateGenome(brain, brainGenome.ToInternal());
+            var pair = new BrainGenomePair
+            {
+                Key = newBrainKey,
+                Brain = brain.ToPublic(),
+                Genome = brainGenome,
+                Caracteristics = unit.Brains[brainKey].Caracteristics
+            };
+            unit.Brains.Add(newBrainKey, pair);
         }
     }
 }

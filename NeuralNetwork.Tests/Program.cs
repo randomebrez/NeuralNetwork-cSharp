@@ -45,8 +45,9 @@ internal class program
 
         var networkCaracteristics = new List<BrainCaracteristics>
         {
-            new BrainCaracteristics("Main")
+            new BrainCaracteristics()
             {
+                BrainName = "Main",
                 InputLayer = inputLayer,
                 OutputLayer = outputLayer,
                 NeutralLayers = new List<LayerCaracteristics> { neutralLayer_1, neutralLayer_2 },
