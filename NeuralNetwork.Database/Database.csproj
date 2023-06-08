@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NeuralNetwork.DataBase.Abstraction\NeuralNetwork.DataBase.Abstraction.csproj" />
+    <ProjectReference Include="..\NeuralNetwork.DataBase.Abstraction\DataBase.Abstraction.csproj" />
   </ItemGroup>
 
 </Project>

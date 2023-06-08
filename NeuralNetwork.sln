@@ -5,16 +5,16 @@ VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuralNetwork", "NeuralNetwork\NeuralNetwork.csproj", "{F8E8C271-A322-4E07-98F5-933D9129D967}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuralNetwork.Interfaces", "NeuralNetwork.Interfaces\NeuralNetwork.Interfaces.csproj", "{90F32069-2502-47ED-99E6-C913A07261AB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuralNetwork.Abstraction", "NeuralNetwork.Interfaces\NeuralNetwork.Abstraction.csproj", "{90F32069-2502-47ED-99E6-C913A07261AB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuralNetwork.DataBase.Abstraction", "NeuralNetwork.DataBase.Abstraction\NeuralNetwork.DataBase.Abstraction.csproj", "{AE47A18D-6B79-486C-BE9A-07EE90AC6990}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataBase.Abstraction", "NeuralNetwork.DataBase.Abstraction\DataBase.Abstraction.csproj", "{AE47A18D-6B79-486C-BE9A-07EE90AC6990}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9444DDE7-224E-450B-B994-9E39A0C225F7}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuralNetwork.Database", "NeuralNetwork.Database\NeuralNetwork.Database.csproj", "{D1D76109-BF63-49BA-97A4-F35C07196CFA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Database", "NeuralNetwork.Database\Database.csproj", "{D1D76109-BF63-49BA-97A4-F35C07196CFA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrainEncryption.Abstraction", "BrainEncryption.Abstraction\BrainEncryption.Abstraction.csproj", "{1520CF84-0061-4B09-BAF9-D42D0247AC58}"
 EndProject
