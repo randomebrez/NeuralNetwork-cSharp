@@ -6,11 +6,11 @@ namespace NeuralNetwork.Interfaces.Model
     {
         public GenomeGraph()
         {
-            GenomeNodes = new List<BrainGenomePair>();
+            GenomeNodes = new List<GenomeCaracteristicPair>();
             GenomeEdges = new Dictionary<string, List<string>>();
         }
 
-        public List<BrainGenomePair> GenomeNodes { get; set; }
+        public List<GenomeCaracteristicPair> GenomeNodes { get; set; }
 
         public Dictionary<string, List<string>> GenomeEdges { get; set; }
     }

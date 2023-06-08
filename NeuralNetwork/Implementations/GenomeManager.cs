@@ -1,17 +1,17 @@
 ﻿using BrainEncryption;
 using BrainEncryption.Abstraction;
-using NeuralNetwork.Helpers;
 using NeuralNetwork.Interfaces;
 using NeuralNetwork.Interfaces.Model;
 using System.Collections.Generic;
 using Genome = NeuralNetwork.Interfaces.Model.Genome;
 using Brain = NeuralNetwork.Interfaces.Model.Brain;
+using NeuralNetwork.Interfaces.Model.Caracteristics;
 
 namespace NeuralNetwork.Implementations
 {
     public class GenomeManager : IGenomeManager
     {
-        private IGenome _genomeEncryption;
+        private IGenomeEncrypter _genomeEncryption;
         private IBrainBuilder _brainBuilder;
 
         public GenomeManager()
@@ -20,6 +20,8 @@ namespace NeuralNetwork.Implementations
             _brainBuilder = new BrainBuilder();
         }
 
+        // Get genomes from caracteristics
+        // Generate geneCodes
         public List<Genome> GenomesListGet(int number, BrainCaracteristics caracteristics)
         {
             var result = new List<Genome>();
@@ -36,7 +38,8 @@ namespace NeuralNetwork.Implementations
             return result;
         }
 
-        public Genome GenomeCroosOverGet(Genome genomeA, Genome genomeB, BrainCaracteristics caracteristics, int crossOverNumber, float mutationRate)
+        // Croos over 2 genomes
+        public Genome GenomeCrossOverGet(Genome genomeA, Genome genomeB, BrainCaracteristics caracteristics, int crossOverNumber, float mutationRate)
         {
             var mappedBrainCarac = caracteristics.ToNetworkCaracteristic();
             var geneCodes = _genomeEncryption.GetGeneCodes(mappedBrainCarac);
@@ -48,15 +51,9 @@ namespace NeuralNetwork.Implementations
             // Apply mutation on generated genome        
             return _genomeEncryption.MutateGenome(mixedGenome, geneCodes, mutationRate).ToPublic();
         }
-         
-        public Brain GenomeToBrainTranslate(Genome genome, BrainCaracteristics caracteristics)
-        {
-            var brain = _brainBuilder.BuildBrain(caracteristics.ToNetworkCaracteristic());
-            _genomeEncryption.TranslateGenome(brain, genome.ToInternal());
 
-            return brain.ToPublic();
-        }
-
+        // Generate units to client use
+        // Translate the GenomeGraph in a BrainGraph that is then used by client for calculation
         public Unit[] UnitsFromGenomeGraphList(List<GenomeGraph> genomeGraphs)
         {
             var number = genomeGraphs.Count;
@@ -65,29 +62,47 @@ namespace NeuralNetwork.Implementations
             {
                 var unit = new Unit();
                 unit.GenomeGraph = genomeGraphs[i];
-                unit.BrainGraph = GetBrainGraphFromGenomeGraph(genomeGraphs[i]);
+                unit.BrainGraph = GenomeGraphToBrainGraphTranslate(genomeGraphs[i]);
                 units[i] = unit;
             }
 
             return units;
         }
 
-        private BrainGraph GetBrainGraphFromGenomeGraph(GenomeGraph graph)
+        // Translate a genome into a brain
+        public BrainGenomePair GenomeToBrainTranslate(Genome genome, BrainCaracteristics caracteristics)
+        {
+            var brain = _brainBuilder.BuildBrain(caracteristics.ToNetworkCaracteristic());
+            _genomeEncryption.TranslateGenome(brain, genome.ToInternal());
+
+            return new BrainGenomePair
+            {
+                Genome = genome,
+                Brain = brain.ToPublic(),
+                Caracteristics = caracteristics
+            };
+        }
+
+        // Translate a GenomeGraph into a BrainGraph
+        // Meaning it translates every genome of the GenomeGraph into a brain, then create the edges
+        private BrainGraph GenomeGraphToBrainGraphTranslate(GenomeGraph graph)
         {
             var brainGraph = new BrainGraph();
 
+            // Translate genomes into brains
             foreach(var genomeNode in graph.GenomeNodes)
             {
-                var brain = GenomeToBrainTranslate(genomeNode.Genome, genomeNode.Caracteristics);
-                brainGraph.BrainNodes.Add(genomeNode.Caracteristics.BrainName, brain);
+                var brainGenomePair = GenomeToBrainTranslate(genomeNode.Genome, genomeNode.Caracteristics);
+                brainGraph.BrainNodes.Add(genomeNode.Caracteristics.BrainName, brainGenomePair);
 
                 if (genomeNode.Caracteristics.IsDecisionBrain)
-                    brainGraph.DecisionBrain = brain;
+                    brainGraph.DecisionBrain = brainGenomePair.Brain;
             }
 
+            // Build edges
             foreach(var genomeEdge in graph.GenomeEdges)
             {
-                brainGraph.BrainEdges.Add(genomeEdge.Key, new List<Brain>());
+                brainGraph.BrainEdges.Add(genomeEdge.Key, new List<BrainGenomePair>());
                 foreach (var linkedGenome in genomeEdge.Value)
                     brainGraph.BrainEdges[genomeEdge.Key].Add(brainGraph.BrainNodes[linkedGenome]);
             }

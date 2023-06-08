@@ -1,4 +1,5 @@
 ﻿using NeuralNetwork.Interfaces.Model;
+using NeuralNetwork.Interfaces.Model.Caracteristics;
 using System.Collections.Generic;
 
 namespace NeuralNetwork.Interfaces
@@ -7,9 +8,9 @@ namespace NeuralNetwork.Interfaces
     {
         List<Genome> GenomesListGet(int number, BrainCaracteristics caracteristics);
 
-        Brain GenomeToBrainTranslate(Genome genome, BrainCaracteristics caracteristics);
+        BrainGenomePair GenomeToBrainTranslate(Genome genome, BrainCaracteristics caracteristics);
 
-        Genome GenomeCroosOverGet(Genome genomeA, Genome genomeB, BrainCaracteristics brainCaracteristics, int crossOverNumber, float mutationRate);
+        Genome GenomeCrossOverGet(Genome genomeA, Genome genomeB, BrainCaracteristics brainCaracteristics, int crossOverNumber, float mutationRate);
 
         Unit[] UnitsFromGenomeGraphList(List<GenomeGraph> genomeGraphs);
     }

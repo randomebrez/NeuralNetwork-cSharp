@@ -56,7 +56,7 @@ namespace NeuralNetwork.Implementations
             if (graph.BrainEdges.TryGetValue(currentBrain.Name, out var originBrains))
             {
                 foreach (var brain in originBrains)
-                    inputToUse.AddRange(ComputeRec(brain, graph, inputs));
+                    inputToUse.AddRange(ComputeRec(brain.Brain, graph, inputs));
             }
             if (inputs.TryGetValue(currentBrain.Name, out var brainInputs))
                 inputToUse.AddRange(brainInputs);

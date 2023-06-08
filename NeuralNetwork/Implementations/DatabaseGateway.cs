@@ -1,6 +1,5 @@
 ﻿using NeuralNetwork.Database;
 using NeuralNetwork.DataBase.Abstraction;
-using NeuralNetwork.Helpers;
 using NeuralNetwork.Interfaces;
 using NeuralNetwork.Interfaces.Model;
 using System;

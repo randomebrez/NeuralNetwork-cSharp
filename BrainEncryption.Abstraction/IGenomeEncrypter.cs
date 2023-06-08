@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace BrainEncryption.Abstraction
 {
-    public interface IGenome
+    public interface IGenomeEncrypter
     {
         HashSet<string> GetGeneCodes(NetworkCaracteristics caracteristics);
 

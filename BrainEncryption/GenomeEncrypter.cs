@@ -7,7 +7,7 @@ using System.Text;
 
 namespace BrainEncryption
 {
-    public class GenomeEncrypter : IGenome
+    public class GenomeEncrypter : IGenomeEncrypter
     {
         public Genome GenerateGenome(GenomeCaracteristics caracteristics, HashSet<string> geneCodes)
         {

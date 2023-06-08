@@ -2,8 +2,9 @@
 using internalDtos = BrainEncryption.Abstraction.Model;
 using System.Linq;
 using System.Collections.Generic;
+using NeuralNetwork.Interfaces.Model.Caracteristics;
 
-namespace NeuralNetwork.Helpers
+namespace NeuralNetwork
 {
     public static class Mapper
     {
@@ -12,7 +13,7 @@ namespace NeuralNetwork.Helpers
         {
             return new internalDtos.GenomeCaracteristics(genomeCaracteristics.GeneNumber, genomeCaracteristics.WeighBytesNumber);
         }
-        public static internalDtos.NetworkCaracteristics ToNetworkCaracteristic(this publicDtos.BrainCaracteristics brainCarac)
+        public static internalDtos.NetworkCaracteristics ToNetworkCaracteristic(this BrainCaracteristics brainCarac)
         {
             return new internalDtos.NetworkCaracteristics
             {
