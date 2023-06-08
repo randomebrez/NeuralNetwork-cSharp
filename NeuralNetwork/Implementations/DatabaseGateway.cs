@@ -30,7 +30,7 @@ namespace NeuralNetwork.Implementations
         {
             try
             {
-                await _dbGateway.StoreBrainsAsync(brains.Select(t => t.ToDb(simulationId, generationId)).ToList());                
+                //await _dbGateway.StoreBrainsAsync(brains.Select(t => t.ToDb(simulationId, generationId)).ToList());                
             }
             catch (Exception ex)
             {

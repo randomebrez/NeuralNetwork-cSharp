@@ -62,7 +62,7 @@ namespace NeuralNetwork.Implementations
                 inputToUse.AddRange(brainInputs);
 
 
-            BrainCalculator(currentBrain, inputToUse);
+            BrainCompute(currentBrain, inputToUse);
             return currentBrain.Neurons.OutputLayer.Neurons.Select(t => t.Value).ToList();
         }
     }

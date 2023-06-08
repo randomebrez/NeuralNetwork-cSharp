@@ -31,7 +31,7 @@ namespace BrainEncryption
         {
             var result = new List<NeuronInput>();
             for(int i = 0; i < inputLayer.NeuronNumber; i++)
-                result.Add(new NeuronInput(i, 0, inputLayer.ActivationFunction));
+                result.Add(new NeuronInput(i, 0, inputLayer.ActivationFunction, inputLayer.ActivationFunction90PercentTreshold));
 
             return result;
         }
