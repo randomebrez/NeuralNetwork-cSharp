@@ -4,6 +4,6 @@ namespace BrainEncryption.Abstraction
 {
     public interface IBrainBuilder
     {
-        Brain BuildBrain(NetworkCaracteristics caracteristics);
+        Brain BrainBuild(NetworkCaracteristics caracteristics);
     }
 }

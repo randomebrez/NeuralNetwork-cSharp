@@ -8,26 +8,26 @@ namespace BrainEncryption
 {
     public class BrainBuilder : IBrainBuilder
     {
-        public Brain BuildBrain(NetworkCaracteristics caracteristics)
+        public Brain BrainBuild(NetworkCaracteristics caracteristics)
         {
             var result = new Brain(caracteristics.OutputLayerId, caracteristics.BrainName);
 
             // Build Inputs
-            result.Neurons.Inputs = BuildInputs(caracteristics.InputLayer);
+            result.Neurons.Inputs = InputNeuronsBuild(caracteristics.InputLayer);
 
             // Build Neutral
-            result.Neurons.Neutrals = BuildNeutrals(caracteristics.NeutralLayers);
+            result.Neurons.Neutrals = NeutralNeuronsBuild(caracteristics.NeutralLayers);
 
             // Build Outputs
-            result.Neurons.Outputs = BuildOutputs(caracteristics.Outputlayer);
+            result.Neurons.Outputs = OutputNeuronsBuild(caracteristics.Outputlayer);
 
             // Build sink neuron
-            result.Neurons.SinkNeuron = BuildSinkNeuron(caracteristics.Outputlayer);
+            result.Neurons.SinkNeuron = SinkNeuronBuild(caracteristics.Outputlayer);
 
             return result;
         }
 
-        private List<NeuronInput> BuildInputs(LayerCaracteristics inputLayer)
+        private List<NeuronInput> InputNeuronsBuild(LayerCaracteristics inputLayer)
         {
             var result = new List<NeuronInput>();
             for(int i = 0; i < inputLayer.NeuronNumber; i++)
@@ -36,14 +36,14 @@ namespace BrainEncryption
             return result;
         }
 
-        private List<NeuronNeutral> BuildNeutrals(List<LayerCaracteristics> neutralLayersCaracteristics)
+        private List<NeuronNeutral> NeutralNeuronsBuild(List<LayerCaracteristics> neutralLayersCaracteristics)
         { 
             var result = new List<NeuronNeutral>();
 
             for(int i = 0; i < neutralLayersCaracteristics.Count; i ++)
             {
                 var currentLayer = neutralLayersCaracteristics[i];
-                var curvemodifier = GetCurveModifier(currentLayer.ActivationFunction, currentLayer.ActivationFunction90PercentTreshold);
+                var curvemodifier = CurveModifierGet(currentLayer.ActivationFunction, currentLayer.ActivationFunction90PercentTreshold);
                 for(int j = 0; j < currentLayer.NeuronNumber; j++)
                     result.Add(new NeuronNeutral(j, currentLayer.LayerId, currentLayer.ActivationFunction, curvemodifier));
             }
@@ -51,10 +51,10 @@ namespace BrainEncryption
             return result;
         }
 
-        private List<NeuronOutput> BuildOutputs(LayerCaracteristics outputLayerCaracteristics)
+        private List<NeuronOutput> OutputNeuronsBuild(LayerCaracteristics outputLayerCaracteristics)
         {
             var result = new List<NeuronOutput>();
-            var curveModifier = GetCurveModifier(outputLayerCaracteristics.ActivationFunction, outputLayerCaracteristics.ActivationFunction90PercentTreshold);
+            var curveModifier = CurveModifierGet(outputLayerCaracteristics.ActivationFunction, outputLayerCaracteristics.ActivationFunction90PercentTreshold);
 
             for (int i = 0; i < outputLayerCaracteristics.NeuronNumber; i++)
                 result.Add(new NeuronOutput(i, outputLayerCaracteristics.LayerId, outputLayerCaracteristics.ActivationFunction, curveModifier));
@@ -62,12 +62,12 @@ namespace BrainEncryption
             return result;
         }
 
-        private NeuronOutput BuildSinkNeuron(LayerCaracteristics outputLayerCaracteristics)
+        private NeuronOutput SinkNeuronBuild(LayerCaracteristics outputLayerCaracteristics)
         {
             return new NeuronOutput(-1, outputLayerCaracteristics.LayerId, ActivationFunctionEnum.ConstantOne, 0);
         }
 
-        private float GetCurveModifier(ActivationFunctionEnum function, float treshold)
+        private float CurveModifierGet(ActivationFunctionEnum function, float treshold)
         {
             switch(function)
             {

@@ -9,7 +9,7 @@ namespace BrainEncryption
 {
     public class GenomeEncrypter : IGenomeEncrypter
     {
-        public Genome GenerateGenome(GenomeCaracteristics caracteristics, HashSet<string> geneCodes)
+        public Genome GenomeGenerate(GenomeCaracteristics caracteristics, HashSet<string> geneCodes)
         {
             var genome = new Genome(caracteristics.GeneNumber);
             var geneCodeList = geneCodes.ToList();
@@ -19,13 +19,13 @@ namespace BrainEncryption
                 var geneCodeRandomIndex = StaticHelper.GetRandomValue(0, geneCodeList.Count - 1);
                 var geneCode = geneCodeList[geneCodeRandomIndex];
                 var gene = new Gene(geneCode, caracteristics.WeightBitArraySize);
-                RandomizeGeneBytes(gene);
+                GeneRandomyze(gene);
                 genome.Genes[i] = gene;
             }
             return genome;
         }
 
-        public HashSet<string> GetGeneCodes(NetworkCaracteristics caracteristics)
+        public HashSet<string> GeneCodesList(NetworkCaracteristics caracteristics)
         {
             var geneCodes = new HashSet<string>();
             for (int input = 0; input < caracteristics.InputLayer.NeuronNumber; input++)
@@ -59,19 +59,19 @@ namespace BrainEncryption
             return geneCodes;
         }
 
-        public Genome GetGenomeFromString(string genomeString)
+        public Genome StringToGenomeTranslate(string genomeString)
         {
             var splittedGenes = genomeString.Split('!');
             var geneNumber = splittedGenes.Length - 1;
             var genome = new Genome(geneNumber);
             for (int i = 0; i < geneNumber; i++)
-                genome.Genes[i] = StringToGene(splittedGenes[i]);
+                genome.Genes[i] = StringToGeneTranslate(splittedGenes[i]);
 
             return genome;
         }
 
 
-        public Genome CrossOver(GenomeCaracteristics caracteristics, Genome genomeDtoA, Genome genomeDtoB, int crossOverNumber)
+        public Genome GenomeCrossOver(GenomeCaracteristics caracteristics, Genome genomeDtoA, Genome genomeDtoB, int crossOverNumber)
         {
             var newGenome = new Genome(caracteristics.GeneNumber);
             var crossOver = false;
@@ -93,7 +93,7 @@ namespace BrainEncryption
             return newGenome.DeepCopy();
         }
 
-        public Genome MutateGenome(Genome baseGenome, HashSet<string> geneCodes, float geneMutationRate)
+        public Genome GenomeMutate(Genome baseGenome, HashSet<string> geneCodes, float geneMutationRate)
         {
             // Check mutation actually occured on returned object
             foreach (var gene in baseGenome.Genes)
@@ -102,12 +102,12 @@ namespace BrainEncryption
                 if (mutationOccur == false)
                     continue;
 
-                MutateGene(gene, geneCodes.ToList());
+                GeneMutate(gene, geneCodes.ToList());
             }
             return baseGenome;
         }
 
-        public void TranslateGenome(Brain brain, Genome genome)
+        public void GenomeTranslate(Brain brain, Genome genome)
         {   
             var edges = new List<Edge>();
             //Read each gene
@@ -120,9 +120,9 @@ namespace BrainEncryption
                         continue;
 
                     if (edge == null)
-                        edge = GetEdgeFromGene(gene, brain.Neurons);
+                        edge = GeneToEdgeTranslate(gene, brain.Neurons);
                     else
-                        edge.Weight += ComputeEdgeWeigh(gene);
+                        edge.Weight += EdgeWeighCompute(gene);
                 }
                 if (edge != null && edge.Weight != 0)
                 {
@@ -135,7 +135,7 @@ namespace BrainEncryption
         }
 
 
-        private Edge GetEdgeFromGene(Gene gene, BrainNeurons neurons)
+        private Edge GeneToEdgeTranslate(Gene gene, BrainNeurons neurons)
         {
             var neuronIdentifiers = gene.EdgeIdentifier.Split('-');
 
@@ -144,11 +144,11 @@ namespace BrainEncryption
                 Identifier = gene.EdgeIdentifier,
                 Origin = neurons.GetNeuronByName(neuronIdentifiers[0]),
                 Target = neurons.GetNeuronByName(neuronIdentifiers[1]),
-                Weight = ComputeEdgeWeigh(gene)
+                Weight = EdgeWeighCompute(gene)
             };
         }
 
-        private float ComputeEdgeWeigh(Gene gene)
+        private float EdgeWeighCompute(Gene gene)
         {
             var weighBits = gene.WeighBits;
             var weighResult = 0f;
@@ -162,7 +162,7 @@ namespace BrainEncryption
             return gene.WeighSign ? weighResult : weighResult * (-1);
         }
 
-        private void RandomizeGeneBytes(Gene gene)
+        private void GeneRandomyze(Gene gene)
         {
             gene.IsActive = true; //StaticHelper.GetBooleanValue();
             gene.WeighSign = StaticHelper.GetBooleanValue();
@@ -171,7 +171,7 @@ namespace BrainEncryption
             gene.Bias = StaticHelper.GetUniformProbability();
         }
 
-        private Gene StringToGene(string geneString)
+        private Gene StringToGeneTranslate(string geneString)
         {
             var splittedGene = geneString.Split("|");
             var weighBytesNumber = splittedGene[1].Length - 1;
@@ -184,7 +184,7 @@ namespace BrainEncryption
             return gene;
         }
 
-        private void MutateGene(Gene gene, List<string> geneCodes, bool allowMutateActiveByte = false)
+        private void GeneMutate(Gene gene, List<string> geneCodes, bool allowMutateActiveByte = false)
         {
             var maxValue = allowMutateActiveByte ? 3 : 2;
 

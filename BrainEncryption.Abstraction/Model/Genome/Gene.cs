@@ -5,6 +5,8 @@ namespace BrainEncryption.Abstraction.Model
 {
     public class Gene
     {
+        public bool IsActive { get; set; }
+
         public Gene(string identifier, int weighBytesLength)
         {
             EdgeIdentifier = identifier;
@@ -13,18 +15,13 @@ namespace BrainEncryption.Abstraction.Model
                 EdgeWeightMaxValue += (int)Math.Pow(2, i);
         }
 
-        public int EdgeWeightMaxValue { get; set; }
-        
         public string EdgeIdentifier { get; set; }
-
-        public bool IsActive { get; set; }
-
         public bool WeighSign { get; set; }
-        
         public bool[] WeighBits { get; set; }
-        
         public float Bias { get; set; }
 
+
+        public int EdgeWeightMaxValue { get; }
         public override string ToString()
         {
             var result = new StringBuilder(EdgeIdentifier);

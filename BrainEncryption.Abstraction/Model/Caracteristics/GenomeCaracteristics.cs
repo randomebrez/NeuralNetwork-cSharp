@@ -9,7 +9,6 @@
         }
 
         public int GeneNumber { get; set; }
-
         public int WeightBitArraySize { get; set; }
     }
 }

@@ -4,7 +4,6 @@ using NeuralNetwork.Interfaces;
 using NeuralNetwork.Interfaces.Model;
 using System.Collections.Generic;
 using Genome = NeuralNetwork.Interfaces.Model.Genome;
-using Brain = NeuralNetwork.Interfaces.Model.Brain;
 using NeuralNetwork.Interfaces.Model.Caracteristics;
 
 namespace NeuralNetwork.Implementations
@@ -28,11 +27,11 @@ namespace NeuralNetwork.Implementations
 
             var genomeCarac = caracteristics.GenomeCaracteristics.ToGenomeCaracteristic();
             var networkCarac = caracteristics.ToNetworkCaracteristic();
-            var geneCodes = _genomeEncryption.GetGeneCodes(networkCarac);
+            var geneCodes = _genomeEncryption.GeneCodesList(networkCarac);
             for(int i = 0; i < number; i ++)
             {
                 // Generate genome
-                result.Add(_genomeEncryption.GenerateGenome(genomeCarac, geneCodes).ToPublic());
+                result.Add(_genomeEncryption.GenomeGenerate(genomeCarac, geneCodes).ToPublic());
             }
 
             return result;
@@ -42,14 +41,14 @@ namespace NeuralNetwork.Implementations
         public Genome GenomeCrossOverGet(Genome genomeA, Genome genomeB, BrainCaracteristics caracteristics, int crossOverNumber, float mutationRate)
         {
             var mappedBrainCarac = caracteristics.ToNetworkCaracteristic();
-            var geneCodes = _genomeEncryption.GetGeneCodes(mappedBrainCarac);
+            var geneCodes = _genomeEncryption.GeneCodesList(mappedBrainCarac);
             var genomeCarac = caracteristics.GenomeCaracteristics.ToGenomeCaracteristic();
 
             // CrossOver genomes
-            var mixedGenome = _genomeEncryption.CrossOver(genomeCarac, genomeA.ToInternal(), genomeB.ToInternal(), crossOverNumber);
+            var mixedGenome = _genomeEncryption.GenomeCrossOver(genomeCarac, genomeA.ToInternal(), genomeB.ToInternal(), crossOverNumber);
 
             // Apply mutation on generated genome        
-            return _genomeEncryption.MutateGenome(mixedGenome, geneCodes, mutationRate).ToPublic();
+            return _genomeEncryption.GenomeMutate(mixedGenome, geneCodes, mutationRate).ToPublic();
         }
 
         // Generate units to client use
@@ -72,8 +71,8 @@ namespace NeuralNetwork.Implementations
         // Translate a genome into a brain
         public BrainGenomePair GenomeToBrainTranslate(Genome genome, BrainCaracteristics caracteristics)
         {
-            var brain = _brainBuilder.BuildBrain(caracteristics.ToNetworkCaracteristic());
-            _genomeEncryption.TranslateGenome(brain, genome.ToInternal());
+            var brain = _brainBuilder.BrainBuild(caracteristics.ToNetworkCaracteristic());
+            _genomeEncryption.GenomeTranslate(brain, genome.ToInternal());
 
             return new BrainGenomePair
             {
