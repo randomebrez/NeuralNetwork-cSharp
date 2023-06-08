@@ -1,22 +1,21 @@
-﻿using NeuralNetwork.Database;
-using NeuralNetwork.DataBase.Abstraction;
+﻿using DataBase;
+using DataBase.Abstraction;
 using NeuralNetwork.Interfaces;
 using NeuralNetwork.Interfaces.Model;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace NeuralNetwork.Implementations
 {
     public class DatabaseGateway : IDatabaseGateway
     {
-        private IDatabaseStorage _dbGateway;
+        private IDataBaseStorage _dbGateway;
 
 
         public DatabaseGateway(string sqlFilePath)
         {
-            _dbGateway = new DatabaseStorage(sqlFilePath);
+            _dbGateway = new DataBaseStorage(sqlFilePath);
         }
 
 

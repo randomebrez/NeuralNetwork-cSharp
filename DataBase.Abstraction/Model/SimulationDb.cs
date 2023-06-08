@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace NeuralNetwork.DataBase.Abstraction.Model
+namespace DataBase.Abstraction.Model
 {
     [Table("simulations")]
     public class SimulationDb

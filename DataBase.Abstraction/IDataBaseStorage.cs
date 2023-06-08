@@ -1,10 +1,10 @@
-﻿using NeuralNetwork.DataBase.Abstraction.Model;
+﻿using DataBase.Abstraction.Model;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace NeuralNetwork.DataBase.Abstraction
+namespace DataBase.Abstraction
 {
-    public interface IDatabaseStorage
+    public interface IDataBaseStorage
     {
         Task<int> AddNewSimulationAsync();
 

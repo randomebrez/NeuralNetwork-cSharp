@@ -1,15 +1,15 @@
-﻿using NeuralNetwork.DataBase.Abstraction;
-using NeuralNetwork.DataBase.Abstraction.Model;
+﻿using DataBase.Abstraction;
+using DataBase.Abstraction.Model;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace NeuralNetwork.Database
+namespace DataBase
 {
-    public class DatabaseStorage : IDatabaseStorage
+    public class DataBaseStorage : IDataBaseStorage
     {
         private readonly Context _context;
-        public DatabaseStorage(string sqlFilePath)
+        public DataBaseStorage(string sqlFilePath)
         {
             var context = new Context(sqlFilePath);
             context.Database.EnsureCreated();

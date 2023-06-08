@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
 	  <TargetFramework>netstandard2.1</TargetFramework>
@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NeuralNetwork.DataBase.Abstraction\DataBase.Abstraction.csproj" />
+    <ProjectReference Include="..\DataBase.Abstraction\DataBase.Abstraction.csproj" />
   </ItemGroup>
 
 </Project>

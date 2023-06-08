@@ -7,9 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BrainEncryption.Abstraction\BrainEncryption.Abstraction.csproj" />
     <ProjectReference Include="..\BrainEncryption\BrainEncryption.csproj" />
-    <ProjectReference Include="..\NeuralNetwork.Database\Database.csproj" />
+    <ProjectReference Include="..\Database\Database.csproj" />
     <ProjectReference Include="..\NeuralNetwork.Interfaces\NeuralNetwork.Abstraction.csproj" />
   </ItemGroup>
 

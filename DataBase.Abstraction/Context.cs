@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using NeuralNetwork.DataBase.Abstraction.Model;
+using DataBase.Abstraction.Model;
 
-namespace NeuralNetwork.DataBase.Abstraction
+namespace DataBase.Abstraction
 {
     public class Context : DbContext
     {
