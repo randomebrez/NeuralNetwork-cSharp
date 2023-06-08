@@ -6,6 +6,7 @@ namespace NeuralNetwork.Interfaces
 {
     public interface IPopulationManager
     {
+        //OU_TEST : Only used by test prog
         Unit[] GenerateFirstGeneration(int childNumber, List<BrainCaracteristics> brainCaracteristics);
 
         Unit[] GenerateNewGeneration(int childNumber, List<Unit> selectedUnits, List<BrainCaracteristics> brainCaracteristics, ReproductionCaracteristics reproductionCaracteristics);

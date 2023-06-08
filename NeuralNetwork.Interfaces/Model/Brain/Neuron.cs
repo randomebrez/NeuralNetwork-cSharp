@@ -2,7 +2,7 @@
 
 namespace NeuralNetwork.Interfaces.Model
 {
-    public abstract class Neuron
+    public class Neuron
     {
         public int Id { get; set; }
 
@@ -46,20 +46,5 @@ namespace NeuralNetwork.Interfaces.Model
                     break;
             }
         }
-    }
-
-    public class NeuronInput : Neuron
-    {
-
-    }
-
-    public class NeuronNeutral : Neuron
-    {
-
-    }
-
-    public class NeuronOutput : Neuron
-    {
-
     }
 }

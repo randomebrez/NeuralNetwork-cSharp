@@ -122,9 +122,7 @@ namespace BrainEncryption
                     if (edge == null)
                         edge = GetEdgeFromGene(gene, brain.Neurons);
                     else
-                    {
                         edge.Weight += ComputeEdgeWeigh(gene);
-                    }
                 }
                 if (edge != null && edge.Weight != 0)
                 {

@@ -5,12 +5,12 @@ namespace NeuralNetwork.Interfaces
 {
     public interface IGenomeManager
     {
-        List<Genome> GetGenomes(int number, BrainCaracteristics caracteristics);
+        List<Genome> GenomesListGet(int number, BrainCaracteristics caracteristics);
 
-        Brain TranslateGenome(Genome genome, BrainCaracteristics caracteristics);
+        Brain GenomeToBrainTranslate(Genome genome, BrainCaracteristics caracteristics);
 
-        Genome GetMixedGenome(Genome genomeA, Genome genomeB, BrainCaracteristics brainCaracteristics, int crossOverNumber, float mutationRate);
+        Genome GenomeCroosOverGet(Genome genomeA, Genome genomeB, BrainCaracteristics brainCaracteristics, int crossOverNumber, float mutationRate);
 
-        Unit[] GetUnitFromGenomeGraphs(List<GenomeGraph> genomeGraphs);
+        Unit[] UnitsFromGenomeGraphList(List<GenomeGraph> genomeGraphs);
     }
 }

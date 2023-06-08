@@ -9,7 +9,5 @@ namespace NeuralNetwork.Interfaces
         Task StoreBrainsAsync(int simulationId, int generationId, List<Brain> brains);
 
         Task<int> AddNewSimulationAsync();
-
-
     }
 }

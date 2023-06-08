@@ -2,11 +2,12 @@
 {
     public abstract class Neuron
     {
-        public Neuron(int id, int layerId, ActivationFunctionEnum activationFunction)
+        public Neuron(int id, int layerId, ActivationFunctionEnum activationFunction, float curveModifier)
         {
             Id = id;
             LayerId = layerId;
             ActivationFunction = activationFunction;
+            CurveModifier = curveModifier;
         }
 
         public int Id { get; }
@@ -20,11 +21,13 @@
         public int LayerId { get; }
 
         public ActivationFunctionEnum ActivationFunction { get; }
+
+        public float CurveModifier { get; }
     }
 
     public class NeuronInput : Neuron
     {
-        public NeuronInput(int id, int layerId, ActivationFunctionEnum activationFunction) : base(id, layerId, activationFunction)
+        public NeuronInput(int id, int layerId, ActivationFunctionEnum activationFunction, float curveModifier) : base(id, layerId, activationFunction, curveModifier)
         {
         }
 
@@ -35,9 +38,8 @@
 
     public class NeuronNeutral : Neuron
     {
-        public NeuronNeutral(int id, int layerId, ActivationFunctionEnum activationFunction, float curveModifier) : base(id, layerId, activationFunction)
+        public NeuronNeutral(int id, int layerId, ActivationFunctionEnum activationFunction, float curveModifier) : base(id, layerId, activationFunction, curveModifier)
         {
-            CurveModifier = curveModifier;
         }
 
         public override string UniqueId => $"N{LayerId}:{Id}";
@@ -46,20 +48,16 @@
 
         public override bool CanBeTarget { get => true; }
 
-        public float CurveModifier { get; }
     }
 
     public class NeuronOutput : Neuron
     {
-        public NeuronOutput(int id, int layerId, ActivationFunctionEnum activationFunction, float curveModifier) : base(id, layerId, activationFunction)
+        public NeuronOutput(int id, int layerId, ActivationFunctionEnum activationFunction, float curveModifier) : base(id, layerId, activationFunction, curveModifier)
         {
-            CurveModifier = curveModifier;
         }
 
         public override string UniqueId => $"O:{Id}";
 
         public override bool CanBeTarget { get => true; }
-
-        public float CurveModifier { get; }
     }
 }

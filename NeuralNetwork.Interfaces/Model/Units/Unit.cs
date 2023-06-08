@@ -1,30 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace NeuralNetwork.Interfaces.Model
 {
     public class Unit
     {
-        public Unit()
-        {
-            Identifier = Guid.NewGuid();
-            Brains = new Dictionary<string, BrainGenomePair>();
-        }
+        public Guid Identifier { get; } = Guid.NewGuid();
 
-        public Guid Identifier { get; set; }
-
+        // Parents (can be null)
         public Guid ParentA { get; set; }
-
         public Guid ParentB { get; set; }
 
-        public Dictionary<string, BrainGenomePair> Brains { get; set; }
-
-        public GenomeGraph GenomeGraph { get; set; }
-
-        public BrainGraph BrainGraph { get; set; }
-
-        public int UseForChildCounter { get; set; }
-
+        // Children parameters
         public int MaxChildNumber { get; set; } = 3;
+        public int ChildrenNumber { get; set; }
+
+
+        // GenomeGraph is used for construction of BrainGraph. It can be saved in database to be retranslated. Cost less than register the BrainGraph
+        // BrainGraph is used for calculations
+        public GenomeGraph GenomeGraph { get; set; }
+        public BrainGraph BrainGraph { get; set; }
     }
 }

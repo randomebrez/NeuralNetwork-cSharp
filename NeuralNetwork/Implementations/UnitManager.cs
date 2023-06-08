@@ -7,6 +7,7 @@ namespace NeuralNetwork.Managers
 {
     public class UnitManager : IUnitBrains
     {
+        //OU_TEST : Only used by test prog
         private readonly Unit _unit;
 
 
@@ -18,11 +19,11 @@ namespace NeuralNetwork.Managers
 
         public void ComputeBrain(string brainKey, List<float> inputs)
         {
-            var brain = _unit.Brains[brainKey].Brain;
-            InitialyzeInputNeuronsValue(brain, inputs);
-
-            for (int i = 1; i <= brain.OutputLayerId + 1; i++)
-                ComputeLayer(brain, i);
+            //var brain = _unit.Brains[brainKey].Brain;
+            //InitialyzeInputNeuronsValue(brain, inputs);
+            //
+            //for (int i = 1; i <= brain.OutputLayerId + 1; i++)
+            //    ComputeLayer(brain, i);
         }
 
         public (int ouputId, float neuronIntensity) GetBestOutput(string brainKey)
@@ -38,41 +39,41 @@ namespace NeuralNetwork.Managers
             return brain.Neurons.Outputs.Select(t => t.Value).ToList();
         }
 
-        private void InitialyzeInputNeuronsValue(Brain brain, List<float> inputs)
-        {
-            for (int i = 0; i < brain.Neurons.Inputs.Count; i++)
-            {
-                brain.Neurons.Inputs[i].Value = inputs[i];
-                brain.Neurons.Inputs[i].ActivationFunction();
-            }
-        }
-
-        private void ComputeLayer(Brain brain, int layerId)
-        {
-            var vertices = brain.Edges.Where(t => t.Target.Layer == layerId).ToList();
-            var groupedByTarget = vertices.GroupBy(t => t.Target.UniqueId);
-
-            foreach (var vertexBatch in groupedByTarget)
-            {
-                var targetNeuron = brain.Neurons.GetNeuronByName(vertexBatch.First().Target.UniqueId);
-                var computedValue = 0f;
-                foreach (var vertex in vertexBatch)
-                {
-                    var origin = brain.Neurons.GetNeuronByName(vertex.Origin.UniqueId);
-                    computedValue += origin.Value * vertex.Weight;
-                }
-                targetNeuron.Value = computedValue / vertexBatch.Count();
-                targetNeuron.ActivationFunction();
-            }
-        }
-
-        private Neuron GetBestOutput(Brain brain)
-        {
-            var bestOutput = brain.Neurons.Outputs.OrderBy(t => t.Value).Last();
-
-            return bestOutput.Value == 0f ?
-                brain.Neurons.SinkNeuron :
-                bestOutput;
-        }
+        //private void InitialyzeInputNeuronsValue(Brain brain, List<float> inputs)
+        //{
+        //    for (int i = 0; i < brain.Neurons.Inputs.Count; i++)
+        //    {
+        //        brain.Neurons.Inputs[i].Value = inputs[i];
+        //        brain.Neurons.Inputs[i].ActivationFunction();
+        //    }
+        //}
+        //
+        //private void ComputeLayer(Brain brain, int layerId)
+        //{
+        //    var vertices = brain.Edges.Where(t => t.Target.Layer == layerId).ToList();
+        //    var groupedByTarget = vertices.GroupBy(t => t.Target.UniqueId);
+        //
+        //    foreach (var vertexBatch in groupedByTarget)
+        //    {
+        //        var targetNeuron = brain.Neurons.GetNeuronByName(vertexBatch.First().Target.UniqueId);
+        //        var computedValue = 0f;
+        //        foreach (var vertex in vertexBatch)
+        //        {
+        //            var origin = brain.Neurons.GetNeuronByName(vertex.Origin.UniqueId);
+        //            computedValue += origin.Value * vertex.Weight;
+        //        }
+        //        targetNeuron.Value = computedValue / vertexBatch.Count();
+        //        targetNeuron.ActivationFunction();
+        //    }
+        //}
+        //
+        //private Neuron GetBestOutput(Brain brain)
+        //{
+        //    var bestOutput = brain.Neurons.Outputs.OrderBy(t => t.Value).Last();
+        //
+        //    return bestOutput.Value == 0f ?
+        //        brain.Neurons.SinkNeuron :
+        //        bestOutput;
+        //}
     }
 }

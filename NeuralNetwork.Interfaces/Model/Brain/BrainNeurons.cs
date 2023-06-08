@@ -5,20 +5,13 @@ namespace NeuralNetwork.Interfaces.Model
 {
     public class BrainNeurons
     {
-        public BrainNeurons()
-        {
-            Inputs = new List<NeuronInput>();
-            Neutrals = new List<NeuronNeutral>();
-            Outputs = new List<NeuronOutput>();
-        }
+        public NeuronLayer InputLayer { get; set; }
 
-        public List<NeuronInput> Inputs { get; set; }
+        public List<NeuronLayer> NeutralLayers { get; set; } = new List<NeuronLayer>();
 
-        public List<NeuronNeutral> Neutrals { get; set; }
+        public NeuronLayer OutputLayer { get; set; }
 
-        public List<NeuronOutput> Outputs { get; set; }
-
-        public NeuronOutput SinkNeuron { get; set; }
+        public Neuron SinkNeuron { get; set; }
 
         public Neuron GetNeuronByName(string name)
         {
@@ -26,11 +19,12 @@ namespace NeuralNetwork.Interfaces.Model
             switch(type)
             {
                 case 'I':
-                    return Inputs.FirstOrDefault(t => t.UniqueId == name);
+                    return InputLayer.Neurons.FirstOrDefault(t => t.UniqueId == name);
                 case 'N':
-                    return Neutrals.FirstOrDefault(t => t.UniqueId == name);
+                    var layerIndex = name[1];
+                    return NeutralLayers[(int)layerIndex].Neurons.FirstOrDefault(t => t.UniqueId == name);
                 case 'O':
-                    return Outputs.FirstOrDefault(t => t.UniqueId == name);
+                    return OutputLayer.Neurons.FirstOrDefault(t => t.UniqueId == name);
             }
             return null;
         }

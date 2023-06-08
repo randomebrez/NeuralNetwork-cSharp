@@ -5,9 +5,10 @@ using System.Linq;
 
 namespace NeuralNetwork.Implementations
 {
-    public class BrainCompute : IBrain
+    public class BrainCalculator : IBrainCalculator
     {
-        public void ComputeBrain(Brain brain, List<float> inputs)
+        // ToDo : transform a brain in a graph to compute recursively
+        public void BrainCompute(Brain brain, List<float> inputs)
         {
             InitialyzeInputNeuronsValue(brain, inputs);
 
@@ -17,10 +18,10 @@ namespace NeuralNetwork.Implementations
 
         private void InitialyzeInputNeuronsValue(Brain brain, List<float> inputs)
         {
-            for (int i = 0; i < brain.Neurons.Inputs.Count; i++)
+            for (int i = 0; i < brain.Neurons.InputLayer.NeuronNumber; i++)
             {
-                brain.Neurons.Inputs[i].Value = inputs[i];
-                brain.Neurons.Inputs[i].ActivationFunction();
+                brain.Neurons.InputLayer.Neurons[i].Value = inputs[i];
+                brain.Neurons.InputLayer.Neurons[i].ActivationFunction();
             }
         }
 
@@ -43,7 +44,8 @@ namespace NeuralNetwork.Implementations
             }
         }
 
-        public List<float> ComputeBrainGraph(BrainGraph graph, Dictionary<string, List<float>> inputs)
+
+        public List<float> BrainGraphCompute(BrainGraph graph, Dictionary<string, List<float>> inputs)
         {
             return ComputeRec(graph.DecisionBrain, graph, inputs);
         }
@@ -60,8 +62,8 @@ namespace NeuralNetwork.Implementations
                 inputToUse.AddRange(brainInputs);
 
 
-            ComputeBrain(currentBrain, inputToUse);
-            return currentBrain.Neurons.Outputs.Select(t => t.Value).ToList();
+            BrainCalculator(currentBrain, inputToUse);
+            return currentBrain.Neurons.OutputLayer.Neurons.Select(t => t.Value).ToList();
         }
     }
 }

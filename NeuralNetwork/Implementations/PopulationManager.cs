@@ -12,6 +12,7 @@ namespace NeuralNetwork.Managers
 {
     public class PopulationManager : IPopulationManager
     {
+        //OU_TEST : Only used by test prog
         private IGenome _genomeEncryption;
         private IBrainBuilder _brainBuilder;
 
@@ -36,14 +37,14 @@ namespace NeuralNetwork.Managers
             while (currentUnitCount < childNumber && fertileUnits.Count > 1)
             {
                 newUnits[currentUnitCount] = GetChild(fertileUnits, brainCaracteristics, reproductionCaracteristics.CrossOverNumber, reproductionCaracteristics.MutationRate);
-                fertileUnits = fertileUnits.Where(t => t.UseForChildCounter < t.MaxChildNumber).ToList();
+                fertileUnits = fertileUnits.Where(t => t.ChildrenNumber < t.MaxChildNumber).ToList();
                 currentUnitCount++;
             }
             var bestUnits = selectedUnits.OrderByDescending(t => t.MaxChildNumber).ToList();
             var unitsToComplete = MathF.Min(childNumber - currentUnitCount, bestUnits.Count);
             for (int i = 0; i < unitsToComplete; i++)
             {
-                bestUnits[i].UseForChildCounter = 0;
+                bestUnits[i].ChildrenNumber = 0;
                 newUnits[currentUnitCount] = bestUnits[i];
                 currentUnitCount++;
             }
@@ -123,8 +124,8 @@ namespace NeuralNetwork.Managers
                 unit.ParentB = parentB.Identifier;
             }
 
-            parentA.UseForChildCounter++;
-            parentB.UseForChildCounter++;
+            parentA.ChildrenNumber++;
+            parentB.ChildrenNumber++;
             return unit;
         }
 
