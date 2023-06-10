@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using NeuralNetwork.Interfaces.Model;
+using NeuralNetwork.Abstraction.Model;
 
-namespace NeuralNetwork.Interfaces
+namespace NeuralNetwork.Abstraction
 {
     public interface IDatabaseGateway
     {

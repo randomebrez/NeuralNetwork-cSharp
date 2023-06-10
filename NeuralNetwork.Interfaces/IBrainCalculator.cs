@@ -1,7 +1,7 @@
-﻿using NeuralNetwork.Interfaces.Model;
+﻿using NeuralNetwork.Abstraction.Model;
 using System.Collections.Generic;
 
-namespace NeuralNetwork.Interfaces
+namespace NeuralNetwork.Abstraction
 {
     public interface IBrainCalculator
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NeuralNetwork.Interfaces.Model
+namespace NeuralNetwork.Abstraction.Model
 {
     public class Unit
     {

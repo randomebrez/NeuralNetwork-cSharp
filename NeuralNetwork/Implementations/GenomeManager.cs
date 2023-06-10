@@ -1,9 +1,9 @@
 ﻿using BrainEncryption;
 using BrainEncryption.Abstraction;
-using NeuralNetwork.Interfaces;
-using NeuralNetwork.Interfaces.Model;
+using NeuralNetwork.Abstraction;
+using NeuralNetwork.Abstraction.Model;
 using System.Collections.Generic;
-using Genome = NeuralNetwork.Interfaces.Model.Genome;
+using Genome = NeuralNetwork.Abstraction.Model.Genome;
 
 namespace NeuralNetwork.Implementations
 {

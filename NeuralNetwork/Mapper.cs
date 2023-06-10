@@ -1,4 +1,4 @@
-﻿using publicDtos = NeuralNetwork.Interfaces.Model;
+﻿using publicDtos = NeuralNetwork.Abstraction.Model;
 using internalDtos = BrainEncryption.Abstraction.Model;
 using System.Linq;
 using System.Collections.Generic;

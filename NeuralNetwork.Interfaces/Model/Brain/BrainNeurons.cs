@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace NeuralNetwork.Interfaces.Model
+namespace NeuralNetwork.Abstraction.Model
 {
     public class BrainNeurons
     {
