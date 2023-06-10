@@ -4,7 +4,6 @@ using NeuralNetwork.Interfaces;
 using NeuralNetwork.Interfaces.Model;
 using System.Collections.Generic;
 using Genome = NeuralNetwork.Interfaces.Model.Genome;
-using NeuralNetwork.Interfaces.Model.Caracteristics;
 
 namespace NeuralNetwork.Implementations
 {
