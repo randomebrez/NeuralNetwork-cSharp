@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuralNetwork", "NeuralNetwork\NeuralNetwork.csproj", "{F8E8C271-A322-4E07-98F5-933D9129D967}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuralNetwork.Abstraction", "NeuralNetwork.Interfaces\NeuralNetwork.Abstraction.csproj", "{90F32069-2502-47ED-99E6-C913A07261AB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuralNetwork.Abstraction", "NeuralNetwork.Abstraction\NeuralNetwork.Abstraction.csproj", "{90F32069-2502-47ED-99E6-C913A07261AB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataBase.Abstraction", "DataBase.Abstraction\DataBase.Abstraction.csproj", "{AE47A18D-6B79-486C-BE9A-07EE90AC6990}"
 EndProject

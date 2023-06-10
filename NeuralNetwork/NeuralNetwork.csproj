@@ -9,7 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BrainEncryption\BrainEncryption.csproj" />
     <ProjectReference Include="..\Database\Database.csproj" />
-    <ProjectReference Include="..\NeuralNetwork.Interfaces\NeuralNetwork.Abstraction.csproj" />
+    <ProjectReference Include="..\NeuralNetwork.Abstraction\NeuralNetwork.Abstraction.csproj" />
   </ItemGroup>
 
 </Project>
