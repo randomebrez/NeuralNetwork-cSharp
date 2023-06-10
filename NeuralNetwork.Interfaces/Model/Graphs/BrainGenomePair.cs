@@ -1,6 +1,4 @@
-﻿using NeuralNetwork.Interfaces.Model.Caracteristics;
-
-namespace NeuralNetwork.Interfaces.Model
+﻿namespace NeuralNetwork.Interfaces.Model
 {
     public class GenomeCaracteristicPair
     {

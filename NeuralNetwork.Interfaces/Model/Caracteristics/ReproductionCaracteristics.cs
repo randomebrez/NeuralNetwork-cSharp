@@ -1,4 +1,4 @@
-﻿namespace NeuralNetwork.Interfaces.Model.Etc
+﻿namespace NeuralNetwork.Interfaces.Model
 {
     public class ReproductionCaracteristics
     {
