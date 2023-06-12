@@ -11,8 +11,8 @@ namespace NeuralNetwork.Implementations
         public void BrainCompute(Brain brain, List<float> inputs)
         {
             InitialyzeInputNeuronsValue(brain, inputs);
-
-            for (int i = 1; i <= brain.OutputLayerId + 1; i++)
+             
+            for (int i = 1; i <= brain.OutputLayerId; i++)
                 ComputeLayer(brain, i);
         }
 
