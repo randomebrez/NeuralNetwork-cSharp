@@ -1,5 +1,6 @@
 ﻿using NeuralNetwork.Abstraction;
 using NeuralNetwork.Abstraction.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -18,10 +19,17 @@ namespace NeuralNetwork.Implementations
 
         private void InitialyzeInputNeuronsValue(Brain brain, List<float> inputs)
         {
-            for (int i = 0; i < brain.Neurons.InputLayer.NeuronNumber; i++)
+            try
             {
-                brain.Neurons.InputLayer.Neurons[i].Value = inputs[i];
-                brain.Neurons.InputLayer.Neurons[i].ActivationFunction();
+                for (int i = 0; i < brain.Neurons.InputLayer.NeuronNumber; i++)
+                {
+                    brain.Neurons.InputLayer.Neurons[i].Value = inputs[i];
+                    brain.Neurons.InputLayer.Neurons[i].ActivationFunction();
+                }
+            }
+            catch
+            {
+                throw new Exception($"InputMethod : {brain.Name} : BrainNeuronN {brain.Neurons.InputLayer.NeuronNumber} : InputLayerNCount {brain.Neurons.InputLayer.Neurons.Count} : InputsN : {inputs.Count}");
             }
         }
 
@@ -47,7 +55,14 @@ namespace NeuralNetwork.Implementations
 
         public List<float> BrainGraphCompute(BrainGraph graph, Dictionary<string, List<float>> inputs)
         {
-            return ComputeRec(graph.DecisionBrain, graph, inputs);
+            try
+            {
+                return ComputeRec(graph.DecisionBrain, graph, inputs);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
         }
 
         private List<float> ComputeRec(Brain currentBrain, BrainGraph graph, Dictionary<string, List<float>> inputs)

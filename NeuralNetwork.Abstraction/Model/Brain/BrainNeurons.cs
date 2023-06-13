@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace NeuralNetwork.Abstraction.Model
 {
@@ -15,18 +17,28 @@ namespace NeuralNetwork.Abstraction.Model
 
         public Neuron GetNeuronByName(string name)
         {
-            var type = name[0];
-            switch(type)
+            var exceptMessage = new StringBuilder();
+            try
             {
-                case 'I':
-                    return InputLayer.Neurons.FirstOrDefault(t => t.UniqueId == name);
-                case 'N':
-                    var layerIndex = name[1];
-                    return NeutralLayers[(int)layerIndex].Neurons.FirstOrDefault(t => t.UniqueId == name);
-                case 'O':
-                    return OutputLayer.Neurons.FirstOrDefault(t => t.UniqueId == name);
+                var type = name[0];
+                switch (type)
+                {
+                    case 'I':
+                        return InputLayer.Neurons.FirstOrDefault(t => t.UniqueId == name);
+                    case 'N':
+                        var layerIndex = (int)Char.GetNumericValue(name[1]);
+                        return NeutralLayers[layerIndex - 1].Neurons.FirstOrDefault(t => t.UniqueId == name);
+                    case 'O':
+                        return OutputLayer.Neurons.FirstOrDefault(t => t.UniqueId == name);
+                    default:
+                        return null;
+                }
             }
-            return null;
+            catch (System.Exception e)
+            {
+                exceptMessage.AppendLine($"{name}; I:{InputLayer.Neurons.Count}; N:{NeutralLayers[0].Neurons.Count}; I:{OutputLayer.Neurons.Count}");
+                throw new System.Exception(exceptMessage.ToString(), e); 
+            }
         }
     }
 }
