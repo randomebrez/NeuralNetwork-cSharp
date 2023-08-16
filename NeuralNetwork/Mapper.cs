@@ -10,7 +10,7 @@ namespace NeuralNetwork
         // Genome & Network caracteristics
         public static internalDtos.GenomeCaracteristics ToGenomeCaracteristic(this publicDtos.GenomeCaracteristics genomeCaracteristics)
         {
-            return new internalDtos.GenomeCaracteristics(genomeCaracteristics.GeneNumber, genomeCaracteristics.WeighBytesNumber);
+            return new internalDtos.GenomeCaracteristics(genomeCaracteristics.GeneNumber, genomeCaracteristics.WeighBytesNumber, genomeCaracteristics.WeightMinimumValue);
         }
         public static internalDtos.NetworkCaracteristics ToNetworkCaracteristic(this publicDtos.BrainCaracteristics brainCarac)
         {
@@ -49,6 +49,7 @@ namespace NeuralNetwork
                 EdgeIdentifier = gene.EdgeIdentifier,
                 WeighSign = gene.WeighSign,
                 WeighBits = gene.WeighBits,
+                WeighMinimumValue = gene.WeightMinimumValue,
                 Bias = gene.Bias,
                 GeneToString = gene.ToString(),
                 IsActive = gene.IsActive
@@ -60,6 +61,7 @@ namespace NeuralNetwork
             {
                 WeighSign = gene.WeighSign,
                 WeighBits = gene.WeighBits,
+                WeightMinimumValue = gene.WeighMinimumValue,
                 Bias = gene.Bias,
                 IsActive = gene.IsActive
             };

@@ -4,6 +4,8 @@
     {
         public int GeneNumber { get; set; }
 
+        public float WeightMinimumValue { get; set; }
+
         public int WeighBytesNumber { get; set; }
     }
 }

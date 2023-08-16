@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace NeuralNetwork.Abstraction.Model
 {
@@ -13,5 +14,9 @@ namespace NeuralNetwork.Abstraction.Model
         public List<GenomeCaracteristicPair> GenomeNodes { get; set; }
 
         public Dictionary<string, List<string>> GenomeEdges { get; set; }
+
+        public Guid ParentA { get; set; }
+
+        public Guid ParentB { get; set; }
     }
 }

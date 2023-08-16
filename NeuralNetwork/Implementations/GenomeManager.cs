@@ -59,6 +59,8 @@ namespace NeuralNetwork.Implementations
             for(int i = 0; i < number; i++)
             {
                 var unit = new Unit();
+                unit.ParentA = genomeGraphs[i].ParentA;
+                unit.ParentB = genomeGraphs[i].ParentB;
                 unit.GenomeGraph = genomeGraphs[i];
                 unit.BrainGraph = GenomeGraphToBrainGraphTranslate(genomeGraphs[i]);
                 units[i] = unit;

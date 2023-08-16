@@ -19,6 +19,7 @@ namespace BrainEncryption
                 var geneCodeRandomIndex = StaticHelper.GetRandomValue(0, geneCodeList.Count - 1);
                 var geneCode = geneCodeList[geneCodeRandomIndex];
                 var gene = new Gene(geneCode, caracteristics.WeightBitArraySize);
+                gene.WeightMinimumValue = caracteristics.WeightMinimumValue;
                 GeneRandomyze(gene);
                 genome.Genes[i] = gene;
             }
@@ -144,7 +145,7 @@ namespace BrainEncryption
                 Identifier = gene.EdgeIdentifier,
                 Origin = neurons.GetNeuronByName(neuronIdentifiers[0]),
                 Target = neurons.GetNeuronByName(neuronIdentifiers[1]),
-                Weight = EdgeWeighCompute(gene)
+                Weight = gene.WeightMinimumValue + (1 - gene.WeightMinimumValue) * EdgeWeighCompute(gene)
             };
         }
 

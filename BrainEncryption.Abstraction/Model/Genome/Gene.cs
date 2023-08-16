@@ -18,6 +18,7 @@ namespace BrainEncryption.Abstraction.Model
         public string EdgeIdentifier { get; set; }
         public bool WeighSign { get; set; }
         public bool[] WeighBits { get; set; }
+        public float WeightMinimumValue { get; set; }
         public float Bias { get; set; }
 
 

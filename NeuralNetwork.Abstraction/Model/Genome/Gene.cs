@@ -10,6 +10,7 @@
 
         public bool[] WeighBits { get; set; }
 
+        public float WeighMinimumValue { get; set; }
         public float Bias { get; set; }
 
         public bool IsActive { get; set; }        
