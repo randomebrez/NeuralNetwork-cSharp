@@ -103,12 +103,19 @@ namespace NeuralNetwork.Implementations
             }
 
             // Build edges between brains
-            var edges = new Dictionary<string, List<BrainGenomePair>>();
-            foreach(var genomeEdge in genomeGraph.Edges)
+            var edges = new List<GenericEdge<BrainGenomePair>>();
+            foreach(var genomeEdge in genomeGraph.EdgeDic)
             {
-                edges.Add(genomeEdge.Key, new List<BrainGenomePair>());
-                foreach (var linkedGenome in genomeEdge.Value)
-                    edges[genomeEdge.Key].Add(brainGraph.BrainNodes[linkedGenome.Id]);
+                var genericEdge = new GenericEdge<BrainGenomePair>
+                {
+                    Target = generatedBrainsDict[genomeEdge.Key]
+                };
+                for (int i = 0; i < genomeEdge.Value.Origins.Count; i++)
+                {
+                    genericEdge.Origins.Add(i, generatedBrainsDict[genomeEdge.Value.Origins[i].Id]);
+                    genericEdge.Weights.Add(i, 1f);
+                }
+                edges.Add(genericEdge);
             }
 
             // Initialyze brain generic graph object

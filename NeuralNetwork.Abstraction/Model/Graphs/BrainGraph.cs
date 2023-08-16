@@ -6,6 +6,8 @@ namespace NeuralNetwork.Abstraction.Model
     {
         public Dictionary<string, BrainGenomePair> BrainNodes => NodesToDictionary;
 
+        public Dictionary<string, GenericEdge<BrainGenomePair>> EdgeDic => EdgesToDictionary;
+
         public Brain DecisionBrain { get; set; }
     }
 }

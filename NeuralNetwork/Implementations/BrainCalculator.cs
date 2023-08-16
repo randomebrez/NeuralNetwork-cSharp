@@ -68,9 +68,9 @@ namespace NeuralNetwork.Implementations
         private List<float> ComputeRec(Brain currentBrain, BrainGraph brainGraph, Dictionary<string, List<float>> inputs)
         {
             var inputToUse = new List<float>();
-            if (brainGraph.Edges.TryGetValue(currentBrain.Name, out var originBrains))
+            if (brainGraph.EdgeDic.TryGetValue(currentBrain.Name, out var edges))
             {
-                foreach (var brain in originBrains)
+                foreach (var brain in edges.Origins.Values)
                     inputToUse.AddRange(ComputeRec(brain.Brain, brainGraph, inputs));
             }
             if (inputs.TryGetValue(currentBrain.Name, out var brainInputs))
