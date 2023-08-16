@@ -3,6 +3,7 @@ using BrainEncryption.Abstraction;
 using NeuralNetwork.Abstraction;
 using NeuralNetwork.Abstraction.Model;
 using System.Collections.Generic;
+using System.Linq;
 using Genome = NeuralNetwork.Abstraction.Model.Genome;
 
 namespace NeuralNetwork.Implementations
@@ -85,27 +86,34 @@ namespace NeuralNetwork.Implementations
 
         // Translate a GenomeGraph into a BrainGraph
         // Meaning it translates every genome of the GenomeGraph into a brain, then create the edges
-        private BrainGraph GenomeGraphToBrainGraphTranslate(GenomeGraph graph)
+        private BrainGraph GenomeGraphToBrainGraphTranslate(GenomeGraph genomeGraph)
         {
             var brainGraph = new BrainGraph();
 
             // Translate genomes into brains
-            foreach(var genomeNode in graph.GenomeNodes)
+            var generatedBrainsDict = new Dictionary<string, BrainGenomePair>();
+            foreach(var genomeNode in genomeGraph.Nodes)
             {
                 var brainGenomePair = GenomeToBrainTranslate(genomeNode.Genome, genomeNode.Caracteristics);
-                brainGraph.BrainNodes.Add(genomeNode.Caracteristics.BrainName, brainGenomePair);
+                generatedBrainsDict.Add(genomeNode.Caracteristics.BrainName, brainGenomePair);
 
+                // Save decision brain
                 if (genomeNode.Caracteristics.IsDecisionBrain)
                     brainGraph.DecisionBrain = brainGenomePair.Brain;
             }
 
-            // Build edges
-            foreach(var genomeEdge in graph.GenomeEdges)
+            // Build edges between brains
+            var edges = new Dictionary<string, List<BrainGenomePair>>();
+            foreach(var genomeEdge in genomeGraph.Edges)
             {
-                brainGraph.BrainEdges.Add(genomeEdge.Key, new List<BrainGenomePair>());
+                edges.Add(genomeEdge.Key, new List<BrainGenomePair>());
                 foreach (var linkedGenome in genomeEdge.Value)
-                    brainGraph.BrainEdges[genomeEdge.Key].Add(brainGraph.BrainNodes[linkedGenome]);
+                    edges[genomeEdge.Key].Add(brainGraph.BrainNodes[linkedGenome.Id]);
             }
+
+            // Initialyze brain generic graph object
+            brainGraph.InitGraph(generatedBrainsDict.Values.ToList(), edges);
+
             return brainGraph;
         }
     }

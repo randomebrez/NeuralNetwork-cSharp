@@ -1,19 +1,11 @@
 ﻿using System.Collections.Generic;
 
 namespace NeuralNetwork.Abstraction.Model
-{ 
-    public class BrainGraph
+{
+    public class BrainGraph : GenericGraph<BrainGenomePair>
     {
-        public BrainGraph()
-        {
-            BrainNodes = new Dictionary<string, BrainGenomePair>();
-            BrainEdges = new Dictionary<string, List<BrainGenomePair>>();
-        }
-
-        public Dictionary<string, BrainGenomePair> BrainNodes { get; set; }
+        public Dictionary<string, BrainGenomePair> BrainNodes => NodesToDictionary;
 
         public Brain DecisionBrain { get; set; }
-
-        public Dictionary<string, List<BrainGenomePair>> BrainEdges { get; set; }
     }
 }
