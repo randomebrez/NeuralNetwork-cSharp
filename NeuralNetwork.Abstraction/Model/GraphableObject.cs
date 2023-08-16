@@ -2,6 +2,6 @@
 {
     public abstract class GraphableObject
     {
-        public abstract string Id { get; set; }
+        public abstract string Id { get; }
     }
 }
